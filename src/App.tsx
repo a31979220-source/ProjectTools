@@ -47,12 +47,32 @@ export function App() {
     tag: 'all',
   });
 
-  // Initialize Data on Load
+  // Initialize Data on Load & Deduplicate Tasks
   useEffect(() => {
     const loadedProjects = StorageService.getProjects();
-    const loadedTasks = StorageService.getTasks();
+    let loadedTasks = StorageService.getTasks();
     const loadedActiveId = StorageService.getActiveProjectId();
     const loadedTheme = StorageService.getTheme();
+
+    // Auto deduplicate tasks by projectId + associatedPath/title
+    const seenMap = new Set<string>();
+    const deduplicatedTasks: Task[] = [];
+    let hasDuplicates = false;
+
+    for (const t of loadedTasks) {
+      const key = t.projectId + '::' + (t.associatedPath ? t.associatedPath.toLowerCase() : t.title);
+      if (!seenMap.has(key)) {
+        seenMap.add(key);
+        deduplicatedTasks.push(t);
+      } else {
+        hasDuplicates = true;
+      }
+    }
+
+    if (hasDuplicates) {
+      StorageService.saveTasks(deduplicatedTasks);
+      loadedTasks = deduplicatedTasks;
+    }
 
     setProjects(loadedProjects);
     setTasks(loadedTasks);
@@ -232,8 +252,27 @@ export function App() {
     handleSaveTasks(updated);
   };
 
-  // Convert a local file item to a task card in a specific column
+  // Convert a local file item to a task card in a specific column with deduplication
   const handleImportFileAsTask = (file: LocalFileItem, targetColumnId: string = 'todo') => {
+    // Deduplication check: check if task with same associatedPath or title already exists in this project
+    const existingTask = tasks.find(
+      (t) =>
+        t.projectId === activeProjectId &&
+        ((t.associatedPath && t.associatedPath.toLowerCase() === file.path.toLowerCase()) ||
+          t.title === `${file.isDirectory ? '📁 文件夹' : '📄 文件'}: ${file.name}`)
+    );
+
+    if (existingTask) {
+      if (existingTask.columnId !== targetColumnId) {
+        // Move existing task card to the dropped target column
+        handleMoveTask(existingTask.id, targetColumnId);
+      } else {
+        const colName = columns.find((c) => c.id === targetColumnId)?.title || '当前列';
+        alert(`该文件/目录「${file.name}」已存在于看板「${colName}」中，无需重复导入！`);
+      }
+      return;
+    }
+
     const newTask: Task = {
       id: `task-${Date.now()}`,
       projectId: activeProjectId,

@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "vite & electron .",
-    "pack:exe": "npm run build && electron-packager . ProjectTools --platform=win32 --arch=x64 --out=release --overwrite --icon=electron/icon.ico"
+    "pack:exe": "npm run build && electron-packager . ProjectTools --platform=win32 --arch=x64 --out=release --overwrite --icon=electron/icon.ico --ignore=\"^(dist-app|release|\\.git)\""
   },
   "dependencies": {
     "clsx": "^2.1.1",

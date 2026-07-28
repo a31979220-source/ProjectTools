@@ -181,7 +181,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden p-6 bg-slate-50 dark:bg-slate-950 select-none">
+    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-950 select-none">
       {/* Top Bar: Layout Style Toggle & Folder Info */}
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div className="flex items-center gap-3">
@@ -234,14 +234,23 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                {/* Win11 View Mode Switcher */}
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 mr-2">
+                {/* Win11 View Mode Switcher with Smooth Sliding Indicator & Animated Transition */}
+                <div className="relative flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-inner mr-2 select-none w-72">
+                  {/* Sliding Active Pill Background */}
+                  <div
+                    className="absolute top-1 bottom-1 rounded-lg bg-brand-500 shadow-sm transition-all duration-300 ease-out"
+                    style={{
+                      left: folderViewMode === 'grid' ? '4px' : folderViewMode === 'details' ? 'calc(33.333% + 1px)' : 'calc(66.666% - 2px)',
+                      width: 'calc(33.333% - 3px)',
+                    }}
+                  />
+
                   <button
                     onClick={() => handleSelectFolderViewMode('grid')}
                     title="大图标 / 卡片模式"
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'grid'
-                        ? 'bg-brand-500 text-white shadow-sm font-semibold'
+                        ? 'text-white'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
@@ -252,9 +261,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <button
                     onClick={() => handleSelectFolderViewMode('details')}
                     title="Windows 详细信息列表"
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'details'
-                        ? 'bg-brand-500 text-white shadow-sm font-semibold'
+                        ? 'text-white'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
@@ -265,9 +274,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <button
                     onClick={() => handleSelectFolderViewMode('tiles')}
                     title="Win11 平铺列表"
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'tiles'
-                        ? 'bg-brand-500 text-white shadow-sm font-semibold'
+                        ? 'text-white'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
@@ -302,107 +311,48 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
             </div>
 
-            {/* Dynamic Local Folder File Views */}
+            {/* Dynamic Local Folder File Views with Smooth Transition Animation */}
             {localFiles.length === 0 ? (
               <div className="w-full h-20 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-400 text-xs gap-2">
                 <Folder className="w-4 h-4 opacity-50" />
                 <span>文件夹为空或无法读取文件。</span>
               </div>
-            ) : folderViewMode === 'grid' ? (
-              /* GRID VIEW MODE */
-              <div className="flex gap-3 overflow-x-auto pb-2 pt-1 px-1 custom-scrollbar">
-                {localFiles.map((item) => (
-                  <div
-                    key={item.path}
-                    draggable
-                    onDragStart={(e) => handleFileDragStart(e, item)}
-                    className="w-56 shrink-0 bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
-                  >
-                    <div className="flex items-start gap-2.5 mb-2 min-w-0">
-                      {getFileIcon(item)}
-                      <div className="min-w-0 flex-1">
-                        <h4
-                          onClick={() => handleOpenFile(item.path)}
-                          className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate group-hover/card:text-brand-500 transition cursor-pointer"
-                          title={item.name}
-                        >
-                          {item.name}
-                        </h4>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                          <span>{item.isDirectory ? '文件夹' : formatSize(item.size)}</span>
-                          <span>•</span>
-                          <span>{new Date(item.updatedAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-800/80 text-[10px]">
-                      <span className="text-slate-400 group-hover/card:text-brand-500 font-medium transition">
-                        ⋮ 拖拽入看板
-                      </span>
-
-                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                        <OpenWithMenu
-                          itemPath={item.path}
-                          isDirectory={item.isDirectory}
-                          extension={item.extension}
-                          size="sm"
-                        />
-                        <button
-                          onClick={() => onImportFileAsTask(item, 'todo')}
-                          className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20"
-                          title="转为待办任务"
-                        >
-                          +任务
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : folderViewMode === 'details' ? (
-              /* DETAILS TABLE VIEW MODE */
-              <div className="overflow-x-auto max-h-56 custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-bold sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700">
-                    <tr>
-                      <th className="py-2 px-3 w-8"></th>
-                      <th className="py-2 px-3">名称</th>
-                      <th className="py-2 px-3 w-28">修改日期</th>
-                      <th className="py-2 px-3 w-24">类型</th>
-                      <th className="py-2 px-3 w-24 text-right">大小</th>
-                      <th className="py-2 px-3 w-40 text-right">快捷操作</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
+            ) : (
+              <div key={folderViewMode} className="animate-view-switch">
+                {folderViewMode === 'grid' ? (
+                  /* GRID VIEW MODE */
+                  <div className="flex gap-3 overflow-x-auto pb-2 pt-1 px-1 custom-scrollbar">
                     {localFiles.map((item) => (
-                      <tr
+                      <div
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="hover:bg-brand-500/5 transition cursor-grab active:cursor-grabbing group/row"
+                        className="w-56 shrink-0 bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
                       >
-                        <td className="py-2 px-3">{getFileIcon(item)}</td>
-                        <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">
-                          <span
-                            onClick={() => handleOpenFile(item.path)}
-                            className="hover:text-brand-500 transition cursor-pointer truncate block max-w-xs"
-                            title={item.name}
-                          >
-                            {item.name}
+                        <div className="flex items-start gap-2.5 mb-2 min-w-0">
+                          {getFileIcon(item)}
+                          <div className="min-w-0 flex-1">
+                            <h4
+                              onClick={() => handleOpenFile(item.path)}
+                              className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate group-hover/card:text-brand-500 transition cursor-pointer"
+                              title={item.name}
+                            >
+                              {item.name}
+                            </h4>
+                            <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                              <span>{item.isDirectory ? '文件夹' : formatSize(item.size)}</span>
+                              <span>•</span>
+                              <span>{new Date(item.updatedAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-800/80 text-[10px]">
+                          <span className="text-slate-400 group-hover/card:text-brand-500 font-medium transition">
+                            ⋮ 拖拽入看板
                           </span>
-                        </td>
-                        <td className="py-2 px-3 text-slate-400 text-[11px]">
-                          {new Date(item.updatedAt).toLocaleDateString()}
-                        </td>
-                        <td className="py-2 px-3 text-slate-500 text-[11px]">
-                          {item.isDirectory ? '文件夹' : `${item.extension.toUpperCase()} 文件`}
-                        </td>
-                        <td className="py-2 px-3 text-slate-500 text-[11px] text-right font-mono">
-                          {item.isDirectory ? '-' : formatSize(item.size)}
-                        </td>
-                        <td className="py-2 px-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-1.5">
+
+                          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                             <OpenWithMenu
                               itemPath={item.path}
                               isDirectory={item.isDirectory}
@@ -411,54 +361,117 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             />
                             <button
                               onClick={() => onImportFileAsTask(item, 'todo')}
-                              className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20 text-[10px]"
+                              className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20"
                               title="转为待办任务"
                             >
                               +任务
                             </button>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              /* TILES VIEW MODE */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-56 overflow-y-auto p-1 custom-scrollbar">
-                {localFiles.map((item) => (
-                  <div
-                    key={item.path}
-                    draggable
-                    onDragStart={(e) => handleFileDragStart(e, item)}
-                    className="bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      {getFileIcon(item)}
-                      <div className="min-w-0 flex-1">
-                        <h4
-                          onClick={() => handleOpenFile(item.path)}
-                          className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate hover:text-brand-500 transition cursor-pointer"
-                          title={item.name}
-                        >
-                          {item.name}
-                        </h4>
-                        <div className="text-[10px] text-slate-400 truncate">
-                          {item.isDirectory ? '文件夹' : formatSize(item.size)}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
-                      <OpenWithMenu
-                        itemPath={item.path}
-                        isDirectory={item.isDirectory}
-                        extension={item.extension}
-                        size="sm"
-                      />
-                    </div>
+                    ))}
                   </div>
-                ))}
+                ) : folderViewMode === 'details' ? (
+                  /* DETAILS TABLE VIEW MODE */
+                  <div className="overflow-x-auto max-h-56 custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-bold sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700">
+                        <tr>
+                          <th className="py-2 px-3 w-8"></th>
+                          <th className="py-2 px-3">名称</th>
+                          <th className="py-2 px-3 w-28">修改日期</th>
+                          <th className="py-2 px-3 w-24">类型</th>
+                          <th className="py-2 px-3 w-24 text-right">大小</th>
+                          <th className="py-2 px-3 w-40 text-right">快捷操作</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
+                        {localFiles.map((item) => (
+                          <tr
+                            key={item.path}
+                            draggable
+                            onDragStart={(e) => handleFileDragStart(e, item)}
+                            className="hover:bg-brand-500/5 transition cursor-grab active:cursor-grabbing group/row"
+                          >
+                            <td className="py-2 px-3">{getFileIcon(item)}</td>
+                            <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                              <span
+                                onClick={() => handleOpenFile(item.path)}
+                                className="hover:text-brand-500 transition cursor-pointer truncate block max-w-xs"
+                                title={item.name}
+                              >
+                                {item.name}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-slate-400 text-[11px]">
+                              {new Date(item.updatedAt).toLocaleDateString()}
+                            </td>
+                            <td className="py-2 px-3 text-slate-500 text-[11px]">
+                              {item.isDirectory ? '文件夹' : `${item.extension.toUpperCase()} 文件`}
+                            </td>
+                            <td className="py-2 px-3 text-slate-500 text-[11px] text-right font-mono">
+                              {item.isDirectory ? '-' : formatSize(item.size)}
+                            </td>
+                            <td className="py-2 px-3 text-right" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <OpenWithMenu
+                                  itemPath={item.path}
+                                  isDirectory={item.isDirectory}
+                                  extension={item.extension}
+                                  size="sm"
+                                />
+                                <button
+                                  onClick={() => onImportFileAsTask(item, 'todo')}
+                                  className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20 text-[10px]"
+                                  title="转为待办任务"
+                                >
+                                  +任务
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  /* TILES VIEW MODE */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-56 overflow-y-auto p-1 custom-scrollbar">
+                    {localFiles.map((item) => (
+                      <div
+                        key={item.path}
+                        draggable
+                        onDragStart={(e) => handleFileDragStart(e, item)}
+                        className="bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          {getFileIcon(item)}
+                          <div className="min-w-0 flex-1">
+                            <h4
+                              onClick={() => handleOpenFile(item.path)}
+                              className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate hover:text-brand-500 transition cursor-pointer"
+                              title={item.name}
+                            >
+                              {item.name}
+                            </h4>
+                            <div className="text-[10px] text-slate-400 truncate">
+                              {item.isDirectory ? '文件夹' : formatSize(item.size)}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+                          <OpenWithMenu
+                            itemPath={item.path}
+                            isDirectory={item.isDirectory}
+                            extension={item.extension}
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -555,7 +568,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         </div>
       ) : (
         /* ================= VERTICAL COLUMNS VIEW ================= */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-[500px] p-1.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-0 p-1.5 overflow-hidden">
           {columns.map((col) => {
             const columnTasks = tasks
               .filter((t) => t.columnId === col.id)
@@ -571,14 +584,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onDragOver={(e) => handleDragOver(e, col.id)}
                 onDragLeave={(e) => handleDragLeave(e, col.id)}
                 onDrop={(e) => handleDrop(e, col.id)}
-                className={`flex-1 min-w-0 flex flex-col rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border transition-all duration-200 ${
+                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border transition-all duration-200 ${
                   isOver
                     ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
                     : 'border-slate-200/80 dark:border-slate-800'
                 }`}
               >
                 {/* Column Header: Draggable Grip Handle */}
-                <div className="p-3.5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing">
+                <div className="p-3.5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing shrink-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
                     <span
@@ -605,7 +618,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[220px] max-h-[calc(100vh-250px)]">
+                {/* Column Scrollable Task List Container */}
+                <div className="flex-1 min-h-[220px] overflow-y-auto p-3 space-y-3 custom-scrollbar">
                   {columnTasks.length === 0 ? (
                     <div className="h-36 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 text-xs p-3 text-center">
                       <Layers className="w-6 h-6 mb-1.5 opacity-40" />
