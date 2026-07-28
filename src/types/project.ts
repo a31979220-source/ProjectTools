@@ -49,6 +49,14 @@ export interface LocalFileItem {
   extension: string;
 }
 
+export interface CustomOpenApp {
+  id: string;
+  name: string;
+  exePath: string;
+  iconDataUrl?: string; // Native EXE icon as base64 PNG data URL
+  forType?: string;     // Target file extension (e.g. "docx", "py", "pdf") or "folder"
+}
+
 export type ViewMode = 'kanban' | 'gantt' | 'stats';
 
 export interface FilterState {
@@ -72,6 +80,9 @@ declare global {
       openFolder: (path: string) => Promise<boolean>;
       readFolderContent: (path: string) => Promise<LocalFileItem[]>;
       openFile: (path: string) => Promise<boolean>;
+      openWith: (path: string, appName: string, customExePath?: string) => Promise<{ success: boolean; exePath?: string; exeName?: string; iconDataUrl?: string }>;
+      getCustomApps: () => Promise<CustomOpenApp[]>;
+      saveCustomApps: (apps: CustomOpenApp[]) => Promise<boolean>;
       setTheme: (theme: 'dark' | 'light') => void;
     };
   }

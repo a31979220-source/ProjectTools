@@ -1,6 +1,7 @@
 import React from 'react';
 import { Task, Priority } from '../types/project';
-import { Calendar, CheckSquare, Clock, Tag as TagIcon, Trash2, Edit3, AlertCircle, FolderOpen, ExternalLink } from 'lucide-react';
+import { OpenWithMenu } from './OpenWithMenu';
+import { Calendar, CheckSquare, Clock, Tag as TagIcon, Trash2, Edit3, AlertCircle, FolderOpen } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
@@ -31,17 +32,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Check if overdue
   const isOverdue = task.dueDate && new Date(task.dueDate).getTime() < new Date().setHours(0,0,0,0) && task.columnId !== 'done';
   const isDueToday = task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString() && task.columnId !== 'done';
-
-  const handleOpenFolder = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (task.associatedPath) {
-      if (window.electronAPI?.openFolder) {
-        window.electronAPI.openFolder(task.associatedPath);
-      } else {
-        alert(`关联路径: ${task.associatedPath}`);
-      }
-    }
-  };
 
   return (
     <div
@@ -96,14 +86,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Associated Local Folder Badge */}
       {task.associatedPath && (
-        <div
-          onClick={handleOpenFolder}
-          className="mb-2.5 px-2 py-1 bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 rounded-lg text-[11px] font-mono flex items-center gap-1.5 border border-brand-500/20 cursor-pointer transition truncate"
-          title={`在 Windows 资源管理器中打开: ${task.associatedPath}`}
-        >
-          <FolderOpen className="w-3 h-3 text-brand-500 shrink-0" />
-          <span className="truncate">{task.associatedPath}</span>
-          <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0 ml-auto" />
+        <div className="mb-2.5 px-2 py-1 bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-lg text-[11px] font-mono flex items-center justify-between gap-1 border border-brand-500/20 truncate">
+          <div className="flex items-center gap-1 min-w-0 truncate">
+            <FolderOpen className="w-3 h-3 text-brand-500 shrink-0" />
+            <span className="truncate" title={task.associatedPath}>{task.associatedPath}</span>
+          </div>
+          <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+            <OpenWithMenu
+              itemPath={task.associatedPath}
+              isDirectory={true}
+              size="sm"
+            />
+          </div>
         </div>
       )}
 
