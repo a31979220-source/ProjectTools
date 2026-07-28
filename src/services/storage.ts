@@ -168,6 +168,24 @@ export class StorageService {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
   }
 
+  // Load Columns
+  static getColumns(): Column[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.COLUMNS);
+      if (!data) {
+        this.saveColumns(DEFAULT_COLUMNS);
+        return DEFAULT_COLUMNS;
+      }
+      return JSON.parse(data);
+    } catch {
+      return DEFAULT_COLUMNS;
+    }
+  }
+
+  static saveColumns(columns: Column[]): void {
+    localStorage.setItem(STORAGE_KEYS.COLUMNS, JSON.stringify(columns));
+  }
+
   // Export Backup
   static exportBackup(): string {
     const backup: BackupData = {

@@ -33,6 +33,7 @@ interface KanbanBoardProps {
   onOpenNewTaskModalForColumn: (columnId: string) => void;
   onOpenEditProjectModal: () => void;
   onImportFileAsTask: (file: LocalFileItem, targetColumnId?: string) => void;
+  onReorderColumns?: (columns: Column[]) => void;
 }
 
 type FolderViewMode = 'grid' | 'details' | 'tiles';
@@ -51,6 +52,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onOpenNewTaskModalForColumn,
   onOpenEditProjectModal,
   onImportFileAsTask,
+  onReorderColumns,
 }) => {
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
   const [layoutStyle, setLayoutStyle] = useState<'horizontal' | 'vertical'>(() => {
@@ -62,9 +64,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     return (localStorage.getItem('pt_folder_view_mode_v1') as FolderViewMode) || 'grid';
   });
 
-  const handleSelectLayoutStyle = (mode: 'horizontal' | 'vertical') => {
-    setLayoutStyle(mode);
-    localStorage.setItem('pt_layout_style_v1', mode);
+  const handleSelectLayoutStyle = (style: 'horizontal' | 'vertical') => {
+    setLayoutStyle(style);
+    localStorage.setItem('pt_layout_style_v1', style);
   };
 
   const handleSelectFolderViewMode = (mode: FolderViewMode) => {
@@ -72,23 +74,26 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     localStorage.setItem('pt_folder_view_mode_v1', mode);
   };
 
-  // Drag Task Card
   const handleTaskDragStart = (e: React.DragEvent, taskId: string) => {
-    e.dataTransfer.setData('drag-type', 'task-card');
+    e.stopPropagation();
+    e.dataTransfer.setData('drag-type', 'task-item');
     e.dataTransfer.setData('text/plain', taskId);
-    e.dataTransfer.effectAllowed = 'move';
   };
 
-  // Drag Local File Card to Kanban Column
+  const handleColumnDragStart = (e: React.DragEvent, columnId: string) => {
+    e.stopPropagation();
+    e.dataTransfer.setData('drag-type', 'column-item');
+    e.dataTransfer.setData('text/plain', columnId);
+  };
+
   const handleFileDragStart = (e: React.DragEvent, file: LocalFileItem) => {
+    e.stopPropagation();
     e.dataTransfer.setData('drag-type', 'file-item');
     e.dataTransfer.setData('application/json', JSON.stringify(file));
-    e.dataTransfer.effectAllowed = 'copy';
   };
 
   const handleDragOver = (e: React.DragEvent, columnId: string) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
     if (dragOverColumnId !== columnId) {
       setDragOverColumnId(columnId);
     }
@@ -106,6 +111,22 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     setDragOverColumnId(null);
 
     const dragType = e.dataTransfer.getData('drag-type');
+
+    if (dragType === 'column-item') {
+      const draggedColId = e.dataTransfer.getData('text/plain');
+      if (draggedColId && draggedColId !== targetColumnId && onReorderColumns) {
+        const colIdxA = columns.findIndex((c) => c.id === draggedColId);
+        const colIdxB = columns.findIndex((c) => c.id === targetColumnId);
+        if (colIdxA !== -1 && colIdxB !== -1) {
+          const newCols = [...columns];
+          const [moved] = newCols.splice(colIdxA, 1);
+          newCols.splice(colIdxB, 0, moved);
+          const reordered = newCols.map((c, idx) => ({ ...c, order: idx }));
+          onReorderColumns(reordered);
+        }
+      }
+      return;
+    }
 
     if (dragType === 'file-item') {
       const fileJson = e.dataTransfer.getData('application/json');
@@ -178,8 +199,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                <span>纵向列视图</span>
+                <span>垂直4列 (经典)</span>
               </button>
+
               <button
                 onClick={() => handleSelectLayoutStyle('horizontal')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
@@ -189,63 +211,31 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 }`}
               >
                 <Rows className="w-3.5 h-3.5" />
-                <span>横向泳道视图</span>
+                <span>横向泳道 (文件联动)</span>
               </button>
             </div>
           </div>
         </div>
-
-        {/* Local Folder Sync Header */}
-        <div className="flex items-center gap-2">
-          {localFolderPath ? (
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-xl text-xs">
-              <FolderOpen className="w-4 h-4 text-brand-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                关联文件夹：
-              </span>
-              <span className="font-mono text-slate-500 dark:text-slate-400 truncate max-w-xs">
-                {localFolderPath}
-              </span>
-              <button
-                onClick={onRefreshFiles}
-                title="刷新本地文件"
-                className={`p-1 text-slate-400 hover:text-brand-500 transition ${isLoadingFiles ? 'animate-spin' : ''}`}
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenEditProjectModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 rounded-xl text-xs font-semibold border border-brand-500/30 transition"
-            >
-              <FolderOpen className="w-3.5 h-3.5" />
-              <span>点击关联本地文件夹</span>
-            </button>
-          )}
-        </div>
       </div>
 
-      {/* Main Workspace Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto space-y-6 pr-1">
-        {/* ================= SECTION 1: Local Folder Contents Horizontal Bar ================= */}
-        {localFolderPath && (
-          <div className="bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm">
-            {/* Header & Win11 View Switcher */}
-            <div className="flex items-center justify-between mb-3.5 flex-wrap gap-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <FolderOpen className="w-4 h-4 text-brand-500" />
-                <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                  📁 本地关联文件夹内容 ({localFiles.length} 个项目)
-                </h3>
-                <span className="text-[11px] text-brand-500 font-semibold bg-brand-500/10 px-2 py-0.5 rounded-md border border-brand-500/20">
-                  ✨ 支持拖拽卡片到下方列，或切换 Win11 文件浏览模式
+      {/* Local Folder Workspace Scanning Area (Win11 File Explorer UI) */}
+      <div className="mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm shrink-0">
+        {localFolderPath ? (
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <FolderOpen className="w-4 h-4 text-brand-500 shrink-0" />
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
+                  关联工作区: <span className="font-mono font-normal text-slate-500">{localFolderPath}</span>
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold border border-slate-200 dark:border-slate-700 shrink-0">
+                  {localFiles.length} 项
                 </span>
               </div>
-              
-              <div className="flex items-center gap-3 shrink-0">
+
+              <div className="flex items-center gap-2 shrink-0">
                 {/* Win11 View Mode Switcher */}
-                <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 mr-2">
                   <button
                     onClick={() => handleSelectFolderViewMode('grid')}
                     title="大图标 / 卡片模式"
@@ -319,54 +309,51 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <span>文件夹为空或无法读取文件。</span>
               </div>
             ) : folderViewMode === 'grid' ? (
-              /* ================= MODE 1: GRID CARDS VIEW ================= */
-              <div className="flex gap-3.5 overflow-x-auto p-1.5 min-h-[110px] items-stretch">
-                {localFiles.map((file) => (
+              /* GRID VIEW MODE */
+              <div className="flex gap-3 overflow-x-auto pb-2 pt-1 px-1 custom-scrollbar">
+                {localFiles.map((item) => (
                   <div
-                    key={file.path}
+                    key={item.path}
                     draggable
-                    onDragStart={(e) => handleFileDragStart(e, file)}
-                    onDoubleClick={() => handleOpenFile(file.path)}
-                    className="w-60 shrink-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 dark:hover:border-brand-500 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group cursor-grab active:cursor-grabbing hover:scale-[1.01]"
-                    title="按住鼠标拖拽该卡片到下方看板列，或双击打开"
+                    onDragStart={(e) => handleFileDragStart(e, item)}
+                    className="w-56 shrink-0 bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-1.5">
-                          <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 cursor-grab" />
-                          <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60">
-                            {getFileIcon(file)}
-                          </div>
+                    <div className="flex items-start gap-2.5 mb-2 min-w-0">
+                      {getFileIcon(item)}
+                      <div className="min-w-0 flex-1">
+                        <h4
+                          onClick={() => handleOpenFile(item.path)}
+                          className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate group-hover/card:text-brand-500 transition cursor-pointer"
+                          title={item.name}
+                        >
+                          {item.name}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                          <span>{item.isDirectory ? '文件夹' : formatSize(item.size)}</span>
+                          <span>•</span>
+                          <span>{new Date(item.updatedAt).toLocaleDateString()}</span>
                         </div>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-600">
-                          {file.isDirectory ? '目录' : file.extension.toUpperCase() || 'FILE'}
-                        </span>
-                      </div>
-                      <div
-                        className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate mb-1"
-                        title={file.name}
-                      >
-                        {file.name}
                       </div>
                     </div>
 
-                    <div className="pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                      <span className="font-mono text-[10px]">{file.isDirectory ? '文件夹' : formatSize(file.size)}</span>
-                      <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-800/80 text-[10px]">
+                      <span className="text-slate-400 group-hover/card:text-brand-500 font-medium transition">
+                        ⋮ 拖拽入看板
+                      </span>
+
+                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         <OpenWithMenu
-                          itemPath={file.path}
-                          isDirectory={file.isDirectory}
-                          extension={file.extension}
+                          itemPath={item.path}
+                          isDirectory={item.isDirectory}
+                          extension={item.extension}
+                          size="sm"
                         />
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onImportFileAsTask(file);
-                          }}
-                          title="导入为待办任务"
-                          className="px-2 py-1 bg-brand-500/10 hover:bg-brand-500 text-brand-600 dark:text-brand-400 hover:text-white rounded-lg text-[11px] font-bold border border-brand-500/30 transition flex items-center gap-0.5"
+                          onClick={() => onImportFileAsTask(item, 'todo')}
+                          className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20"
+                          title="转为待办任务"
                         >
-                          <span>+任务</span>
+                          +任务
                         </button>
                       </div>
                     </div>
@@ -374,58 +361,58 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 ))}
               </div>
             ) : folderViewMode === 'details' ? (
-              /* ================= MODE 2: WIN11 DETAILS TABLE VIEW ================= */
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/80 overflow-hidden text-xs shadow-sm">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 font-semibold text-[11px]">
-                      <th className="py-2.5 px-4">名称</th>
-                      <th className="py-2.5 px-4">修改日期</th>
-                      <th className="py-2.5 px-4">类型</th>
-                      <th className="py-2.5 px-4">大小</th>
-                      <th className="py-2.5 px-4 text-right">操作 (可拖拽整行到下方)</th>
+              /* DETAILS TABLE VIEW MODE */
+              <div className="overflow-x-auto max-h-56 custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-bold sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="py-2 px-3 w-8"></th>
+                      <th className="py-2 px-3">名称</th>
+                      <th className="py-2 px-3 w-28">修改日期</th>
+                      <th className="py-2 px-3 w-24">类型</th>
+                      <th className="py-2 px-3 w-24 text-right">大小</th>
+                      <th className="py-2 px-3 w-40 text-right">快捷操作</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-200">
-                    {localFiles.map((file) => (
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
+                    {localFiles.map((item) => (
                       <tr
-                        key={file.path}
+                        key={item.path}
                         draggable
-                        onDragStart={(e) => handleFileDragStart(e, file)}
-                        onDoubleClick={() => handleOpenFile(file.path)}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-750 transition cursor-grab active:cursor-grabbing group"
+                        onDragStart={(e) => handleFileDragStart(e, item)}
+                        className="hover:bg-brand-500/5 transition cursor-grab active:cursor-grabbing group/row"
                       >
-                        <td className="py-2 px-4 flex items-center gap-2 font-bold truncate max-w-xs">
-                          <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 shrink-0" />
-                          {getFileIcon(file)}
-                          <span className="truncate">{file.name}</span>
+                        <td className="py-2 px-3">{getFileIcon(item)}</td>
+                        <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                          <span
+                            onClick={() => handleOpenFile(item.path)}
+                            className="hover:text-brand-500 transition cursor-pointer truncate block max-w-xs"
+                            title={item.name}
+                          >
+                            {item.name}
+                          </span>
                         </td>
-                        <td className="py-2 px-4 text-slate-400 font-mono text-[11px]">
-                          {new Date(file.updatedAt).toLocaleString(undefined, {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                        <td className="py-2 px-3 text-slate-400 text-[11px]">
+                          {new Date(item.updatedAt).toLocaleDateString()}
                         </td>
-                        <td className="py-2 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
-                          {file.isDirectory ? '文件夹' : file.extension.toUpperCase() || '文件'}
+                        <td className="py-2 px-3 text-slate-500 text-[11px]">
+                          {item.isDirectory ? '文件夹' : `${item.extension.toUpperCase()} 文件`}
                         </td>
-                        <td className="py-2 px-4 text-slate-400 font-mono text-[11px]">
-                          {file.isDirectory ? '-' : formatSize(file.size)}
+                        <td className="py-2 px-3 text-slate-500 text-[11px] text-right font-mono">
+                          {item.isDirectory ? '-' : formatSize(item.size)}
                         </td>
-                        <td className="py-2 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="py-2 px-3 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-1.5">
                             <OpenWithMenu
-                              itemPath={file.path}
-                              isDirectory={file.isDirectory}
-                              extension={file.extension}
+                              itemPath={item.path}
+                              isDirectory={item.isDirectory}
+                              extension={item.extension}
                               size="sm"
                             />
                             <button
-                              onClick={() => onImportFileAsTask(file)}
-                              className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 dark:text-brand-400 hover:text-white rounded text-[11px] font-bold border border-brand-500/30 transition"
+                              onClick={() => onImportFileAsTask(item, 'todo')}
+                              className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20 text-[10px]"
+                              title="转为待办任务"
                             >
                               +任务
                             </button>
@@ -437,199 +424,211 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 </table>
               </div>
             ) : (
-              /* ================= MODE 3: WIN11 TILES VIEW ================= */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-1">
-                {localFiles.map((file) => (
+              /* TILES VIEW MODE */
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-56 overflow-y-auto p-1 custom-scrollbar">
+                {localFiles.map((item) => (
                   <div
-                    key={file.path}
+                    key={item.path}
                     draggable
-                    onDragStart={(e) => handleFileDragStart(e, file)}
-                    onDoubleClick={() => handleOpenFile(file.path)}
-                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 dark:hover:border-brand-500 rounded-xl p-3 shadow-sm hover:shadow-md transition-all flex items-center justify-between group cursor-grab active:cursor-grabbing"
-                    title="按住鼠标拖拽到下方列，或双击打开"
+                    onDragStart={(e) => handleFileDragStart(e, item)}
+                    className="bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 shrink-0" />
-                      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/60 shrink-0">
-                        {getFileIcon(file)}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">
-                          {file.name}
-                        </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
-                          {file.isDirectory ? '文件夹' : `${file.extension.toUpperCase()} · ${formatSize(file.size)}`}
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {getFileIcon(item)}
+                      <div className="min-w-0 flex-1">
+                        <h4
+                          onClick={() => handleOpenFile(item.path)}
+                          className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate hover:text-brand-500 transition cursor-pointer"
+                          title={item.name}
+                        >
+                          {item.name}
+                        </h4>
+                        <div className="text-[10px] text-slate-400 truncate">
+                          {item.isDirectory ? '文件夹' : formatSize(item.size)}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <div className="flex items-center gap-1 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
                       <OpenWithMenu
-                        itemPath={file.path}
-                        isDirectory={file.isDirectory}
-                        extension={file.extension}
+                        itemPath={item.path}
+                        isDirectory={item.isDirectory}
+                        extension={item.extension}
                         size="sm"
                       />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onImportFileAsTask(file);
-                        }}
-                        title="转为任务"
-                        className="px-1.5 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 dark:text-brand-400 hover:text-white rounded text-[10px] font-bold border border-brand-500/30 transition"
-                      >
-                        +任务
-                      </button>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        )}
-
-        {/* ================= SECTION 2: Board Columns (Horizontal Rows / Vertical Grid) ================= */}
-        {layoutStyle === 'horizontal' ? (
-          /* ================= HORIZONTAL SWIMLANES VIEW ================= */
-          <div className="space-y-4">
-            {columns.map((col) => {
-              const columnTasks = tasks
-                .filter((t) => t.columnId === col.id)
-                .sort((a, b) => a.order - b.order);
-
-              const isOver = dragOverColumnId === col.id;
-
-              return (
-                <div
-                  key={col.id}
-                  onDragOver={(e) => handleDragOver(e, col.id)}
-                  onDragLeave={(e) => handleDragLeave(e, col.id)}
-                  onDrop={(e) => handleDrop(e, col.id)}
-                  className={`bg-slate-100/90 dark:bg-slate-900/60 border rounded-2xl p-4 transition-all duration-200 ${
-                    isOver
-                      ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
-                      : 'border-slate-200/80 dark:border-slate-800'
-                  }`}
-                >
-                  {/* Swimlane Header */}
-                  <div className="flex items-center justify-between mb-3 border-b border-slate-200/60 dark:border-slate-800/80 pb-2">
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: col.color }}
-                      />
-                      <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                        {col.title}
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                        {columnTasks.length}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => onOpenNewTaskModalForColumn(col.id)}
-                      className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 text-xs font-medium transition"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>添加任务</span>
-                    </button>
-                  </div>
-
-                  {/* Horizontal Task Cards Container */}
-                  <div className="flex gap-4 overflow-x-auto p-1.5 min-h-[145px] items-stretch">
-                    {columnTasks.length === 0 ? (
-                      <div className="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-400 text-xs gap-2">
-                        <Layers className="w-5 h-5 opacity-40" />
-                        <span>{isOver ? '🎉 放开鼠标：直接在此状态下新建任务！' : '暂无任务卡片 (支持将上方文件或卡片拖拽至此)'}</span>
-                      </div>
-                    ) : (
-                      columnTasks.map((task) => (
-                        <div key={task.id} className="w-80 shrink-0">
-                          <TaskCard
-                            task={task}
-                            onEdit={onEditTask}
-                            onDelete={onDeleteTask}
-                            onToggleSubtask={onToggleSubtask}
-                            onDragStart={handleTaskDragStart}
-                          />
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         ) : (
-          /* ================= VERTICAL COLUMNS VIEW ================= */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-[500px] p-1.5">
-            {columns.map((col) => {
-              const columnTasks = tasks
-                .filter((t) => t.columnId === col.id)
-                .sort((a, b) => a.order - b.order);
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              <FolderOpen className="w-4 h-4 text-slate-400" />
+              <span>当前项目未关联本地代码或项目文件夹。</span>
+            </div>
+            <button
+              onClick={onOpenEditProjectModal}
+              className="px-3 py-1 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-lg font-bold transition border border-brand-500/20"
+            >
+              + 关联本地项目文件夹
+            </button>
+          </div>
+        )}
+      </div>
 
-              const isOver = dragOverColumnId === col.id;
+      {/* Main Kanban Content Area */}
+      {layoutStyle === 'horizontal' ? (
+        /* ================= HORIZONTAL SWIMLANES VIEW ================= */
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+          {columns.map((col) => {
+            const columnTasks = tasks
+              .filter((t) => t.columnId === col.id)
+              .sort((a, b) => a.order - b.order);
 
-              return (
-                <div
-                  key={col.id}
-                  onDragOver={(e) => handleDragOver(e, col.id)}
-                  onDragLeave={(e) => handleDragLeave(e, col.id)}
-                  onDrop={(e) => handleDrop(e, col.id)}
-                  className={`flex-1 min-w-0 flex flex-col rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border transition-all duration-200 ${
-                    isOver
-                      ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
-                      : 'border-slate-200/80 dark:border-slate-800'
-                  }`}
-                >
-                  <div className="p-3.5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: col.color }}
-                      />
-                      <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">
-                        {col.title}
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
-                        {columnTasks.length}
-                      </span>
-                    </div>
+            const isOver = dragOverColumnId === col.id;
 
-                    <button
-                      onClick={() => onOpenNewTaskModalForColumn(col.id)}
-                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition shrink-0"
-                      title="在该状态下添加任务"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+            return (
+              <div
+                key={col.id}
+                draggable
+                onDragStart={(e) => handleColumnDragStart(e, col.id)}
+                onDragOver={(e) => handleDragOver(e, col.id)}
+                onDragLeave={(e) => handleDragLeave(e, col.id)}
+                onDrop={(e) => handleDrop(e, col.id)}
+                className={`bg-slate-100/90 dark:bg-slate-900/60 border rounded-2xl p-4 transition-all duration-200 ${
+                  isOver
+                    ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
+                    : 'border-slate-200/80 dark:border-slate-800'
+                }`}
+              >
+                {/* Swimlane Header */}
+                <div className="flex items-center justify-between mb-3 border-b border-slate-200/60 dark:border-slate-800/80 pb-2 cursor-grab active:cursor-grabbing">
+                  <div className="flex items-center gap-2.5">
+                    <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
+                    <span
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: col.color }}
+                    />
+                    <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">
+                      {col.title}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      {columnTasks.length}
+                    </span>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[220px] max-h-[calc(100vh-250px)]">
-                    {columnTasks.length === 0 ? (
-                      <div className="h-36 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 text-xs p-3 text-center">
-                        <Layers className="w-6 h-6 mb-1.5 opacity-40" />
-                        <span>{isOver ? '🎉 放开鼠标添加任务' : '暂无任务卡片 (支持连续拖拽任意多个文件或卡片至此)'}</span>
-                      </div>
-                    ) : (
-                      columnTasks.map((task) => (
+                  <button
+                    onClick={() => onOpenNewTaskModalForColumn(col.id)}
+                    className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 text-xs font-medium transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>添加任务</span>
+                  </button>
+                </div>
+
+                {/* Horizontal Task Cards Container */}
+                <div className="flex gap-4 overflow-x-auto p-1.5 min-h-[145px] items-stretch">
+                  {columnTasks.length === 0 ? (
+                    <div className="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-400 text-xs gap-2">
+                      <Layers className="w-5 h-5 opacity-40" />
+                      <span>{isOver ? '🎉 放开鼠标：直接在此状态下新建任务！' : '暂无任务卡片 (支持将上方文件或卡片拖拽至此)'}</span>
+                    </div>
+                  ) : (
+                    columnTasks.map((task) => (
+                      <div key={task.id} className="w-80 shrink-0">
                         <TaskCard
-                          key={task.id}
                           task={task}
                           onEdit={onEditTask}
                           onDelete={onDeleteTask}
                           onToggleSubtask={onToggleSubtask}
                           onDragStart={handleTaskDragStart}
                         />
-                      ))
-                    )}
-                  </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* ================= VERTICAL COLUMNS VIEW ================= */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-[500px] p-1.5">
+          {columns.map((col) => {
+            const columnTasks = tasks
+              .filter((t) => t.columnId === col.id)
+              .sort((a, b) => a.order - b.order);
+
+            const isOver = dragOverColumnId === col.id;
+
+            return (
+              <div
+                key={col.id}
+                draggable
+                onDragStart={(e) => handleColumnDragStart(e, col.id)}
+                onDragOver={(e) => handleDragOver(e, col.id)}
+                onDragLeave={(e) => handleDragLeave(e, col.id)}
+                onDrop={(e) => handleDrop(e, col.id)}
+                className={`flex-1 min-w-0 flex flex-col rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border transition-all duration-200 ${
+                  isOver
+                    ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
+                    : 'border-slate-200/80 dark:border-slate-800'
+                }`}
+              >
+                {/* Column Header: Draggable Grip Handle */}
+                <div className="p-3.5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
+                    <span
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: col.color }}
+                    />
+                    <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">
+                      {col.title}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
+                      {columnTasks.length}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenNewTaskModalForColumn(col.id);
+                    }}
+                    className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition shrink-0"
+                    title="在该状态下添加任务"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[220px] max-h-[calc(100vh-250px)]">
+                  {columnTasks.length === 0 ? (
+                    <div className="h-36 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 text-xs p-3 text-center">
+                      <Layers className="w-6 h-6 mb-1.5 opacity-40" />
+                      <span>{isOver ? '🎉 放开鼠标添加任务' : '暂无任务卡片 (支持连续拖拽任意多个文件或卡片至此)'}</span>
+                    </div>
+                  ) : (
+                    columnTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onEdit={onEditTask}
+                        onDelete={onDeleteTask}
+                        onToggleSubtask={onToggleSubtask}
+                        onDragStart={handleTaskDragStart}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

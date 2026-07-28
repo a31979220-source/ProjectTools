@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Project, Task, Column, ViewMode, FilterState, LocalFileItem } from './types/project';
-import { StorageService, DEFAULT_COLUMNS } from './services/storage';
+import { StorageService } from './services/storage';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { KanbanBoard } from './components/KanbanBoard';
@@ -12,7 +12,7 @@ import { ProjectModal } from './components/ProjectModal';
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [columns] = useState<Column[]>(DEFAULT_COLUMNS);
+  const [columns, setColumns] = useState<Column[]>(() => StorageService.getColumns());
   const [activeProjectId, setActiveProjectId] = useState<string>('');
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -107,6 +107,11 @@ export function App() {
   const handleSaveTasks = (newTasks: Task[]) => {
     setTasks(newTasks);
     StorageService.saveTasks(newTasks);
+  };
+
+  const handleReorderColumns = (newColumns: Column[]) => {
+    setColumns(newColumns);
+    StorageService.saveColumns(newColumns);
   };
 
   // Toggle Dark/Light Theme
@@ -400,6 +405,7 @@ export function App() {
                 }
               }}
               onImportFileAsTask={handleImportFileAsTask}
+              onReorderColumns={handleReorderColumns}
             />
           )}
 
