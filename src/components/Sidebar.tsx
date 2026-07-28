@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Project, ViewMode } from '../types/project';
+import React from 'react';
+import { Project, Task, ViewMode } from '../types/project';
 import appLogo from '../assets/app-icon.png';
 import { 
   Kanban, 
@@ -15,12 +15,16 @@ import {
   Trash2,
   Edit3,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  TrendingUp,
+  CheckSquare,
+  AlertCircle
 } from 'lucide-react';
 
 interface SidebarProps {
   projects: Project[];
   activeProjectId: string;
+  activeProjectTasks?: Task[];
   onSelectProject: (id: string) => void;
   onOpenNewProjectModal: () => void;
   onOpenEditProjectModal: (project: Project) => void;
@@ -41,6 +45,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   projects,
   activeProjectId,
+  activeProjectTasks = [],
   onSelectProject,
   onOpenNewProjectModal,
   onOpenEditProjectModal,
@@ -56,59 +61,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
 }) => {
-  // Listen for Ctrl+B shortcut to toggle sidebar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault();
-        onToggleCollapse();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onToggleCollapse]);
+  // Statistics for Hover Detailed Information Popover
+  const todoCount = activeProjectTasks.filter((t) => t.columnId === 'todo').length;
+  const inProgressCount = activeProjectTasks.filter((t) => t.columnId === 'in_progress').length;
+  const reviewCount = activeProjectTasks.filter((t) => t.columnId === 'review').length;
+  const doneCount = activeProjectTasks.filter((t) => t.columnId === 'done').length;
+
+  const urgentCount = activeProjectTasks.filter((t) => t.priority === 'urgent').length;
+  const highCount = activeProjectTasks.filter((t) => t.priority === 'high').length;
+  const mediumCount = activeProjectTasks.filter((t) => t.priority === 'medium').length;
+  const lowCount = activeProjectTasks.filter((t) => t.priority === 'low').length;
+
+  let totalSubtasks = 0;
+  let completedSubtasks = 0;
+  let overdueCount = 0;
+  const todayMs = new Date().setHours(0, 0, 0, 0);
+
+  activeProjectTasks.forEach((t) => {
+    totalSubtasks += t.subtasks?.length || 0;
+    completedSubtasks += t.subtasks?.filter((st) => st.completed).length || 0;
+    if (t.dueDate && new Date(t.dueDate).getTime() < todayMs && t.columnId !== 'done') {
+      overdueCount += 1;
+    }
+  });
 
   return (
     <aside
-      className={`h-full bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 flex flex-col border-r border-slate-200 dark:border-slate-800 select-none transition-all duration-300 ease-in-out shrink-0 relative ${
+      className={`${
         isCollapsed ? 'w-16' : 'w-64'
-      }`}
+      } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative z-30 select-none`}
     >
-      {/* Brand Header & Toggle Button */}
-      <div className="p-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 shrink-0">
+      {/* Brand Header */}
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <img
-            src={appLogo}
-            alt="ProjectTools Logo"
-            className="w-9 h-9 rounded-xl object-cover shadow-md border border-slate-200 dark:border-slate-700/80 shrink-0"
-          />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0 overflow-hidden">
+            <img src={appLogo} alt="ProjectTools" className="w-full h-full object-cover" />
+          </div>
           {!isCollapsed && (
-            <div className="min-w-0 animate-fadeIn">
-              <h1 className="font-bold text-slate-800 dark:text-slate-100 text-base leading-snug tracking-wide truncate">
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight truncate">
                 ProjectTools
               </h1>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">单机版项目管理</p>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block truncate">
+                v1.0.0 • 本地桌面版
+              </span>
             </div>
           )}
         </div>
 
-        {/* Toggle Button */}
         <button
           onClick={onToggleCollapse}
-          title={isCollapsed ? '展开侧边栏 (Ctrl+B)' : '折叠侧边栏 (Ctrl+B)'}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+          title={isCollapsed ? '展开侧边栏' : '折叠侧边栏'}
+          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
         >
           {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* Main Navigation Views */}
-      <div className="p-2 border-b border-slate-200 dark:border-slate-800/60 shrink-0">
-        {!isCollapsed && (
-          <div className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">
-            视图模式
-          </div>
-        )}
+      {/* Navigation Links */}
+      <div className="p-2 border-b border-slate-200 dark:border-slate-800">
         <nav className="space-y-1">
           <button
             onClick={() => onSelectViewMode('kanban')}
@@ -178,14 +189,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title={proj.name}
                 className={`group flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between px-3 py-2'} rounded-xl text-xs font-medium cursor-pointer border transition-colors duration-150 ${
                   isActive
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-700 shadow-sm font-semibold'
-                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 shadow-sm font-semibold'
+                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: proj.color || '#3b82f6' }}
+                    style={{ backgroundColor: proj.color }}
                   />
                   {!isCollapsed && <span className="truncate">{proj.name}</span>}
                 </div>
@@ -198,7 +209,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         onOpenEditProjectModal(proj);
                       }}
                       title="编辑项目"
-                      className="p-1 text-slate-400 hover:text-brand-500 transition"
+                      className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
@@ -206,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm(`确定要删除项目 "${proj.name}" 及其所有关联任务吗？`)) {
+                          if (confirm(`确定删除项目 "${proj.name}" 及其所有任务卡片吗？`)) {
                             onDeleteProject(proj.id);
                           }
                         }}
@@ -224,12 +235,96 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Progress Card */}
+      {/* Progress Card with Detailed Information Hover Popover */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40 shrink-0">
-          <div className="bg-white dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40 shrink-0 relative group/progress">
+          {/* Detailed Progress Popover on Hover */}
+          <div className="absolute bottom-full left-3 right-3 mb-2 opacity-0 pointer-events-none group-hover/progress:opacity-100 group-hover/progress:pointer-events-auto transition-all duration-200 ease-out z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3.5 shadow-2xl space-y-3 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-brand-500" /> 项目进度与统计明细
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-500 font-bold border border-brand-500/20">
+                {totalTasksCount === 0 ? 0 : Math.round((completedTasksCount / totalTasksCount) * 100)}% 完成
+              </span>
+            </div>
+
+            {/* 4 Column Task Distribution */}
+            <div>
+              <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
+                看板状态列分布
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 text-xs">
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-slate-400" /> 待办事项
+                  </span>
+                  <span className="font-bold font-mono text-[11px]">{todoCount}</span>
+                </div>
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" /> 进行中
+                  </span>
+                  <span className="font-bold font-mono text-[11px]">{inProgressCount}</span>
+                </div>
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" /> 审核/测试
+                  </span>
+                  <span className="font-bold font-mono text-[11px]">{reviewCount}</span>
+                </div>
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-1.5 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> 已完成
+                  </span>
+                  <span className="font-bold font-mono text-[11px]">{doneCount}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Priority Distribution */}
+            <div>
+              <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
+                任务优先级概览
+              </div>
+              <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
+                <div className="bg-rose-500/10 text-rose-500 border border-rose-500/20 p-1 rounded-lg">
+                  <div className="font-bold">紧急</div>
+                  <div className="font-mono text-xs">{urgentCount}</div>
+                </div>
+                <div className="bg-amber-500/10 text-amber-500 border border-amber-500/20 p-1 rounded-lg">
+                  <div className="font-bold">高</div>
+                  <div className="font-mono text-xs">{highCount}</div>
+                </div>
+                <div className="bg-blue-500/10 text-blue-500 border border-blue-500/20 p-1 rounded-lg">
+                  <div className="font-bold">中</div>
+                  <div className="font-mono text-xs">{mediumCount}</div>
+                </div>
+                <div className="bg-slate-500/10 text-slate-400 border border-slate-500/20 p-1 rounded-lg">
+                  <div className="font-bold">低</div>
+                  <div className="font-mono text-xs">{lowCount}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Subtasks Progress & Overdue Warnings */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+              <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-medium">
+                <CheckSquare className="w-3.5 h-3.5 text-brand-500" /> 子任务: {completedSubtasks}/{totalSubtasks}
+              </span>
+              {overdueCount > 0 ? (
+                <span className="flex items-center gap-1 text-rose-500 font-bold animate-pulse">
+                  <AlertCircle className="w-3.5 h-3.5" /> 逾期 {overdueCount} 项
+                </span>
+              ) : (
+                <span className="text-[10px] text-emerald-500 font-semibold">无逾期任务</span>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50 shadow-sm cursor-pointer hover:border-brand-500/50 transition-all">
             <div className="flex items-center justify-between text-xs mb-1.5 text-slate-700 dark:text-slate-300">
-              <span className="flex items-center gap-1.5 font-medium">
+              <span className="flex items-center gap-1.5 font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> 总完成进度
               </span>
               <span className="font-bold text-slate-900 dark:text-slate-200">

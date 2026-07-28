@@ -372,6 +372,7 @@ export function App() {
       <Sidebar
         projects={projects}
         activeProjectId={activeProjectId}
+        activeProjectTasks={activeProjectTasks}
         onSelectProject={handleSelectProject}
         onOpenNewProjectModal={() => {
           setEditingProject(null);

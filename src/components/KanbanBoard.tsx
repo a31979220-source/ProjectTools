@@ -59,9 +59,21 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     return (localStorage.getItem('pt_layout_style_v1') as 'horizontal' | 'vertical') || 'vertical';
   });
 
-  // Win11 style folder view mode
+  // Global folder scanner view mode
   const [folderViewMode, setFolderViewMode] = useState<FolderViewMode>(() => {
     return (localStorage.getItem('pt_folder_view_mode_v1') as FolderViewMode) || 'grid';
+  });
+
+  // Per-column task card display modes state
+  const [columnViewModes, setColumnViewModes] = useState<Record<string, FolderViewMode>>(() => {
+    try {
+      const saved = localStorage.getItem('pt_column_view_modes_v2');
+      return saved
+        ? JSON.parse(saved)
+        : { todo: 'grid', in_progress: 'grid', review: 'grid', done: 'grid' };
+    } catch (e) {
+      return { todo: 'grid', in_progress: 'grid', review: 'grid', done: 'grid' };
+    }
   });
 
   const handleSelectLayoutStyle = (style: 'horizontal' | 'vertical') => {
@@ -69,9 +81,21 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     localStorage.setItem('pt_layout_style_v1', style);
   };
 
-  const handleSelectFolderViewMode = (mode: FolderViewMode) => {
+  const handleSetColumnViewMode = (colId: string, mode: FolderViewMode) => {
+    const updated = { ...columnViewModes, [colId]: mode };
+    setColumnViewModes(updated);
+    localStorage.setItem('pt_column_view_modes_v2', JSON.stringify(updated));
+  };
+
+  const handleSetAllColumnsViewMode = (mode: FolderViewMode) => {
     setFolderViewMode(mode);
     localStorage.setItem('pt_folder_view_mode_v1', mode);
+    const updated: Record<string, FolderViewMode> = {};
+    columns.forEach((c) => {
+      updated[c.id] = mode;
+    });
+    setColumnViewModes(updated);
+    localStorage.setItem('pt_column_view_modes_v2', JSON.stringify(updated));
   };
 
   const handleTaskDragStart = (e: React.DragEvent, taskId: string) => {
@@ -234,7 +258,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                {/* Win11 View Mode Switcher with Smooth Sliding Indicator & Animated Transition */}
+                {/* Win11 View Mode Switcher with Smooth Sliding Indicator (Batch Switch All Columns) */}
                 <div className="relative flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-inner mr-2 select-none w-72">
                   {/* Sliding Active Pill Background */}
                   <div
@@ -246,8 +270,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   />
 
                   <button
-                    onClick={() => handleSelectFolderViewMode('grid')}
-                    title="大图标 / 卡片模式"
+                    onClick={() => handleSetAllColumnsViewMode('grid')}
+                    title="全局一键设为：大图标模式"
                     className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'grid'
                         ? 'text-white'
@@ -259,8 +283,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   </button>
 
                   <button
-                    onClick={() => handleSelectFolderViewMode('details')}
-                    title="Windows 详细信息列表"
+                    onClick={() => handleSetAllColumnsViewMode('details')}
+                    title="全局一键设为：详细信息列表"
                     className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'details'
                         ? 'text-white'
@@ -272,8 +296,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   </button>
 
                   <button
-                    onClick={() => handleSelectFolderViewMode('tiles')}
-                    title="Win11 平铺列表"
+                    onClick={() => handleSetAllColumnsViewMode('tiles')}
+                    title="全局一键设为：平铺列表"
                     className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
                       folderViewMode === 'tiles'
                         ? 'text-white'
@@ -327,14 +351,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="w-56 shrink-0 bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
+                        className="w-56 shrink-0 bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5 mb-2 min-w-0">
                           {getFileIcon(item)}
                           <div className="min-w-0 flex-1">
                             <h4
                               onClick={() => handleOpenFile(item.path)}
-                              className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate group-hover/card:text-brand-500 transition cursor-pointer"
+                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate group-hover/card:text-brand-500 transition cursor-pointer"
                               title={item.name}
                             >
                               {item.name}
@@ -347,8 +371,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-800/80 text-[10px]">
-                          <span className="text-slate-400 group-hover/card:text-brand-500 font-medium transition">
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-700/60 text-[10px]">
+                          <span className="text-slate-400 dark:text-slate-400 group-hover/card:text-brand-500 font-medium transition">
                             ⋮ 拖拽入看板
                           </span>
 
@@ -394,7 +418,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             className="hover:bg-brand-500/5 transition cursor-grab active:cursor-grabbing group/row"
                           >
                             <td className="py-2 px-3">{getFileIcon(item)}</td>
-                            <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                            <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-100">
                               <span
                                 onClick={() => handleOpenFile(item.path)}
                                 className="hover:text-brand-500 transition cursor-pointer truncate block max-w-xs"
@@ -406,10 +430,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             <td className="py-2 px-3 text-slate-400 text-[11px]">
                               {new Date(item.updatedAt).toLocaleDateString()}
                             </td>
-                            <td className="py-2 px-3 text-slate-500 text-[11px]">
+                            <td className="py-2 px-3 text-slate-500 dark:text-slate-400 text-[11px]">
                               {item.isDirectory ? '文件夹' : `${item.extension.toUpperCase()} 文件`}
                             </td>
-                            <td className="py-2 px-3 text-slate-500 text-[11px] text-right font-mono">
+                            <td className="py-2 px-3 text-slate-500 dark:text-slate-400 text-[11px] text-right font-mono">
                               {item.isDirectory ? '-' : formatSize(item.size)}
                             </td>
                             <td className="py-2 px-3 text-right" onClick={(e) => e.stopPropagation()}>
@@ -442,14 +466,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
+                        className="bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
                       >
                         <div className="flex items-center gap-2.5 min-w-0 flex-1">
                           {getFileIcon(item)}
                           <div className="min-w-0 flex-1">
                             <h4
                               onClick={() => handleOpenFile(item.path)}
-                              className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate hover:text-brand-500 transition cursor-pointer"
+                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate hover:text-brand-500 transition cursor-pointer"
                               title={item.name}
                             >
                               {item.name}
@@ -501,6 +525,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               .sort((a, b) => a.order - b.order);
 
             const isOver = dragOverColumnId === col.id;
+            const colViewMode = columnViewModes[col.id] || 'grid';
 
             return (
               <div
@@ -532,13 +557,52 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => onOpenNewTaskModalForColumn(col.id)}
-                    className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 text-xs font-medium transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>添加任务</span>
-                  </button>
+                  <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    {/* Mini Column Independent Display Mode Switcher */}
+                    <div className="flex items-center bg-slate-200/70 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-300/60 dark:border-slate-700/60 mr-1">
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'grid')}
+                        title="当前列：大图标卡片模式"
+                        className={`p-1 rounded transition ${
+                          colViewMode === 'grid'
+                            ? 'bg-brand-500 text-white shadow-sm'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <LayoutGrid className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'details')}
+                        title="当前列：详细列表模式"
+                        className={`p-1 rounded transition ${
+                          colViewMode === 'details'
+                            ? 'bg-brand-500 text-white shadow-sm'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <List className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'tiles')}
+                        title="当前列：平铺列表模式"
+                        className={`p-1 rounded transition ${
+                          colViewMode === 'tiles'
+                            ? 'bg-brand-500 text-white shadow-sm'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <Grid2X2 className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => onOpenNewTaskModalForColumn(col.id)}
+                      className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 text-xs font-medium transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>添加任务</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Horizontal Task Cards Container */}
@@ -557,6 +621,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           onDelete={onDeleteTask}
                           onToggleSubtask={onToggleSubtask}
                           onDragStart={handleTaskDragStart}
+                          viewMode={colViewMode}
                         />
                       </div>
                     ))
@@ -575,6 +640,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               .sort((a, b) => a.order - b.order);
 
             const isOver = dragOverColumnId === col.id;
+            const colViewMode = columnViewModes[col.id] || 'grid';
 
             return (
               <div
@@ -590,32 +656,71 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     : 'border-slate-200/80 dark:border-slate-800'
                 }`}
               >
-                {/* Column Header: Draggable Grip Handle */}
-                <div className="p-3.5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing shrink-0">
-                  <div className="flex items-center gap-2 min-w-0">
+                {/* Column Header: Draggable Grip Handle & Independent Display Switcher */}
+                <div className="p-3 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing shrink-0">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
                     <span
-                      className="w-3 h-3 rounded-full shrink-0"
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
                       style={{ backgroundColor: col.color }}
                     />
                     <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">
                       {col.title}
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
                       {columnTasks.length}
                     </span>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenNewTaskModalForColumn(col.id);
-                    }}
-                    className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition shrink-0"
-                    title="在该状态下添加任务"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    {/* Mini Column Independent Display Mode Switcher */}
+                    <div className="flex items-center bg-slate-200/70 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-300/60 dark:border-slate-700/60">
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'grid')}
+                        title="当前列：大图标模式"
+                        className={`p-0.5 rounded transition ${
+                          colViewMode === 'grid'
+                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <LayoutGrid className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'details')}
+                        title="当前列：详细列表模式"
+                        className={`p-0.5 rounded transition ${
+                          colViewMode === 'details'
+                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <List className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleSetColumnViewMode(col.id, 'tiles')}
+                        title="当前列：平铺列表模式"
+                        className={`p-0.5 rounded transition ${
+                          colViewMode === 'tiles'
+                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        <Grid2X2 className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenNewTaskModalForColumn(col.id);
+                      }}
+                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition shrink-0"
+                      title="在该状态下添加任务"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Column Scrollable Task List Container */}
@@ -626,16 +731,19 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       <span>{isOver ? '🎉 放开鼠标添加任务' : '暂无任务卡片 (支持连续拖拽任意多个文件或卡片至此)'}</span>
                     </div>
                   ) : (
-                    columnTasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onEdit={onEditTask}
-                        onDelete={onDeleteTask}
-                        onToggleSubtask={onToggleSubtask}
-                        onDragStart={handleTaskDragStart}
-                      />
-                    ))
+                    <div key={colViewMode} className="space-y-2.5 animate-view-switch">
+                      {columnTasks.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          onEdit={onEditTask}
+                          onDelete={onDeleteTask}
+                          onToggleSubtask={onToggleSubtask}
+                          onDragStart={handleTaskDragStart}
+                          viewMode={colViewMode}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
