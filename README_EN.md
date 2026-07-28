@@ -6,7 +6,7 @@
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v3.4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**中文文档** | [English Version](./README_EN.md)
+[中文文档](./README.md) | **English Version**
 
 **ProjectTools** is a modern, high-aesthetic, fluid, and powerful **standalone desktop project management & agile Kanban application**. Built with **Electron + React + TypeScript + Tailwind CSS**, it is designed specifically for developers, project managers, and productivity enthusiasts. Operates 100% locally with zero cloud dependencies—your data stays completely private and secure.
 
@@ -14,81 +14,90 @@
 
 ## ✨ Features & Highlights
 
-### 🎨 1. Modern Visual Design & Aesthetics
-* **Native Dark / Light Theme Switching**: Supports system-following theme modes with a seamless transition and unified Windows Title Bar tinting.
-* **Glassmorphic UI & Micro-animations**: Tailored HSL colors, polished typography, smooth hover effects, and crisp micro-interactions for a premium desktop feel.
+### 🎨 1. Modern Visual Design & Dark Mode Adaptation
+* **Native Dark / Light Theme Toggle**: Supports system theme matching or smooth one-click manual toggling. Windows title bar seamlessly integrates with dark theme.
+* **High-Aesthetic UI & Micro-Animations**: Built with a glassmorphic color system, smooth keyframe transitions, and crisp dark mode cards.
 
-### 📊 2. Multi-Dimensional Project Views
+### 📊 2. Multi-Dimensional Project Views & Flexible Kanban Layout
 * **Agile Kanban Board**:
-  * Customizable workflow columns (To Do, In Progress, Done, etc.) with drag-and-drop task card ordering and status transitions.
-  * Rich task metadata: Priority levels (Urgent, High, Medium, Low), tags, subtask checklists, date ranges, and overdue alerts.
+  * **4-Column Drag & Drop Reordering**: Drag columns via handle (`GripVertical`) to reorder Todo, In Progress, Review, and Done columns with instant local storage persistence.
+  * **Independent Per-Column Display Modes**: Switch each column's card layout independently between **Grid Card**, **Compact Details**, and **Tiles View**, with a top master control bar for batch switching.
+  * **Rich Task Card Details**: Displays full un-truncated titles, associated file paths, split "Open With" buttons, priority badges (Urgent/High/Medium/Low), tags, subtask progress, and due dates/overdue alerts.
+  * **Adaptive Fluid Vertical Scrolling**: Flexbox-driven column containers enable independent smooth scrolling without layout overflow or truncation.
 * **Gantt Chart Timeline**:
-  * Visual timeline tracking with daily and weekly zoom modes for effortless project scheduling.
-* **Statistical Dashboard**:
-  * Real-time metrics on completion rates, priority distributions, tag analytics, and workload progress charts.
+  * Visual project scheduling with daily and weekly timeline zoom controls.
+* **Statistics & Analytics Dashboard**:
+  * Charts for completion rates, priority distribution, tag heatmaps, and work progress.
 
-### 📂 3. Local Workspace Integration & Smart File Explorer (Win11 Style)
-* **Local Folder Linking**: Associate local codebases or project directories directly with any project card.
-* **Three Win11 View Modes**:
-  1. **Grid View** (Large icons)
-  2. **Details View** (Comprehensive file attribute table)
-  3. **Tiles View** (Compact tile cards)
-* **One-Click Task Conversion**: Easily convert scanned local files or directories into actionable Kanban tasks via drag-and-drop or single click.
+### 📈 3. Hover Progress Detail Popover Panel
+* **Instant Hover Insights**: Hover over the bottom progress widget in the sidebar to reveal a popover panel with real-time project metrics:
+  * **4-Column Task Distribution** (Todo, In Progress, Review, Done item counts)
+  * **Priority Breakdown** (Urgent, High, Medium, Low counts)
+  * **Subtasks Completion Ratio**
+  * **Overdue Task Warning Alerts**
 
-### ⚡ 4. Intelligent "Open With" Menu System (`OpenWithMenu`)
-* **Instant Launcher Menu**:
-  * 📁 **System Default Application**: Open files or locate folders in File Explorer.
-  * 💙 **VS Code**: Launch code repositories or single files directly in VS Code.
-  * 💻 **CMD Terminal**: Open Windows Command Prompt directly in the project working directory.
-  * 📄 **Office Applications**: Contextually detects `.docx`, `.xlsx`, `.pptx`, `.pdf` files to launch Word, Excel, PowerPoint, or WPS.
-  * 📝 **Notepad**.
-* **System Native & Custom EXE Picker**:
-  * ⚙️ **Windows System "Open With" Modal**: Triggers native Windows `OpenWith.exe` selection dialog.
-  * 📁 **Browse Custom Executables**: Select any third-party `.exe` software on your PC.
+### 📂 4. Workspace Directory Association & Smart Unique Import (Win11 Style)
+* **Local Workspace Association**: Link local code projects or file directories with one click.
+* **3 Win11 View Modes**:
+  1. **Grid Icon View**
+  2. **Details Table View**
+  3. **Tiles View**
+* **Deduplication Check & Smart Auto-Move**: Drag files onto Kanban columns with automatic deduplication. If a file was previously imported into another column, dragging it automatically moves the existing task card to the target column instead of creating duplicates.
 
-### 🧠 5. Native EXE Icon Extraction & Type-Based Memory Sync
-* **Windows Native Icon Extraction**: Extracts high-definition native 3D icons embedded inside `.exe` executables (e.g. IntelliJ IDEA, PyCharm, Sublime Text logos).
-* **Official Product Name Resolution**: Automatically resolves executable metadata (e.g., maps `idea64` to `IntelliJ IDEA`).
-* **Shared Type Memory**: Associating a custom application with a `.py` file or folder automatically shares that application entry across ALL `.py` files or folders in your workspace!
-* **Permanent Disk Persistence**: Stores user-configured applications permanently in Windows `AppData` (`custom-apps.json`). Custom app records persist across software restarts and reboots.
+### ⚡ 5. Smart "Open With" Application System (`OpenWithMenu`)
+* **Quick Launch**:
+  * 📁 **System Default Application**: Locate file in Explorer or open with system default app.
+  * 💙 **VS Code**: Open file or project directory directly in VS Code.
+  * 💻 **CMD Terminal**: Launch command prompt inside the folder.
+  * 📄 **Office Apps**: Smart detection for `.docx`, `.xlsx`, `.pptx`, `.pdf` to launch Word, Excel, PowerPoint, or WPS.
+  * 📝 **System Notepad**.
+* **System Native & Custom Binary Browsing**:
+  * ⚙️ **Windows "Open With" Dialog**: Triggers native Windows `OpenWith.exe` app picker.
+  * 📁 **Browse `.exe` Files**: Select any custom binary executable on disk.
 
-### 📥 6. Data Backup & Security
-* **JSON Export & Import**: One-click backup and restore of all projects, tasks, and column configurations.
+### 🧠 6. Native Icon Extraction & Shared File Type Memory
+* **Windows Native Icon Extraction**: Extracts embedded high-resolution icons from `.exe` files (e.g., IntelliJ IDEA, PyCharm, Sublime Text).
+* **Official Product Name Resolution**: Parses version info (e.g., resolves `idea64` to `IntelliJ IDEA`).
+* **Shared File Type Memory**: Custom app associations for `.py` or folder items are automatically shared across all matching files in the workspace.
+* **Disk Storage Persistence**: Uses Windows `AppData` disk storage (`custom-apps.json`) to persist entries permanently across app restarts.
+
+### 📥 7. Backup & Data Security
+* **JSON Backup & Restore**: Export full project data to JSON files and restore at any time.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Desktop Framework**: Electron 33
-* **Frontend Framework**: React 18 + TypeScript
-* **Build System**: Vite 6 + Tailwind CSS
-* **Icons**: Lucide React
-* **Packager**: Electron Packager
+* **Desktop Container**: Electron 33
+* **Frontend**: React 18 + TypeScript
+* **Build Tools**: Vite 6 + Tailwind CSS
+* **Icon Library**: Lucide React
+* **Packaging**: Electron Packager (with `--ignore` rule for 3-second instant packaging)
 
 ---
 
-## 🚀 Getting Started & Build Guide
+## 🚀 Quick Start & Build
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Run Development Server (React + Electron)
+### 2. Run in Development Mode
 ```bash
 npm run electron:dev
 ```
 
-### 3. Build Web Production Assets
+### 3. Build Web Assets
 ```bash
 npm run build
 ```
 
-### 4. Package as Windows Desktop `.exe` Application
+### 4. Package as Windows Desktop `.exe` (Instant 3-Second Packaging)
 ```bash
 npm run pack:exe
 ```
-Upon successful packaging, the standalone executable binary `ProjectTools.exe` will be generated in `release/ProjectTools-win32-x64/`.
+After packaging, find the standalone `ProjectTools.exe` inside `release/ProjectTools-win32-x64/`.
 
 ---
 
