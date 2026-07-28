@@ -1,0 +1,78 @@
+export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface SubTask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  columnId: string;
+  title: string;
+  description: string;
+  priority: Priority;
+  tags: string[];
+  subtasks: SubTask[];
+  associatedPath?: string; // Associated local folder or file path for this task
+  startDate?: string; // YYYY-MM-DD
+  dueDate?: string;   // YYYY-MM-DD
+  createdAt: string;  // ISO timestamp
+  updatedAt: string;  // ISO timestamp
+  order: number;
+}
+
+export interface Column {
+  id: string;
+  title: string;
+  color: string;
+  order: number;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  color: string;
+  localFolderPath?: string; // Associated local folder on disk
+  createdAt: string;
+}
+
+export interface LocalFileItem {
+  name: string;
+  path: string;
+  isDirectory: boolean;
+  size: number;
+  updatedAt: string;
+  extension: string;
+}
+
+export type ViewMode = 'kanban' | 'gantt' | 'stats';
+
+export interface FilterState {
+  searchQuery: string;
+  priority: Priority | 'all';
+  tag: string | 'all';
+}
+
+export interface BackupData {
+  version: string;
+  exportedAt: string;
+  projects: Project[];
+  tasks: Task[];
+  columns: Column[];
+}
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      selectFolder: () => Promise<string | null>;
+      openFolder: (path: string) => Promise<boolean>;
+      readFolderContent: (path: string) => Promise<LocalFileItem[]>;
+      openFile: (path: string) => Promise<boolean>;
+      setTheme: (theme: 'dark' | 'light') => void;
+    };
+  }
+}
