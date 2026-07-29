@@ -58,20 +58,41 @@
   border: 1px solid rgba(30, 41, 59, 0.8);
 }
 
-/* View Switch Animations */
-@keyframes viewSwitch {
-  from {
-    opacity: 0.1;
-    transform: translateY(5px) scale(0.992);
+/* Enhanced View Switch Animations & Transitions */
+@keyframes viewSlideForward {
+  0% {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0) scale(0.985);
+    filter: blur(2px);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
   }
 }
 
-.animate-view-switch {
-  animation: viewSwitch 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes viewSlideBackward {
+  0% {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0) scale(0.985);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-view-slide-forward {
+  animation: viewSlideForward 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.animate-view-slide-backward {
+  animation: viewSlideBackward 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
 }
 
 

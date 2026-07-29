@@ -121,44 +121,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation Links */}
       <div className="p-2 border-b border-slate-200 dark:border-slate-800">
         <nav className="space-y-1">
-          <button
-            onClick={() => onSelectViewMode('kanban')}
-            title="看板视图 (Kanban)"
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2 rounded-xl text-xs font-medium border transition-colors duration-150 ${
-              viewMode === 'kanban'
-                ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/30 dark:border-brand-500/40 font-semibold shadow-sm'
-                : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            <Kanban className="w-4 h-4 shrink-0 text-brand-500" />
-            {!isCollapsed && <span className="truncate">看板视图 (Kanban)</span>}
-          </button>
-
-          <button
-            onClick={() => onSelectViewMode('gantt')}
-            title="甘特图视图 (Timeline)"
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2 rounded-xl text-xs font-medium border transition-colors duration-150 ${
-              viewMode === 'gantt'
-                ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/30 dark:border-brand-500/40 font-semibold shadow-sm'
-                : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4 shrink-0 text-brand-500" />
-            {!isCollapsed && <span className="truncate">甘特图视图 (Timeline)</span>}
-          </button>
-
-          <button
-            onClick={() => onSelectViewMode('stats')}
-            title="数据统计与概览"
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} py-2 rounded-xl text-xs font-medium border transition-colors duration-150 ${
-              viewMode === 'stats'
-                ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/30 dark:border-brand-500/40 font-semibold shadow-sm'
-                : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            <PieChart className="w-4 h-4 shrink-0 text-brand-500" />
-            {!isCollapsed && <span className="truncate">数据统计与概览</span>}
-          </button>
+          {[
+            { id: 'kanban' as ViewMode, label: '看板视图 (Kanban)', icon: Kanban },
+            { id: 'gantt' as ViewMode, label: '甘特图视图 (Timeline)', icon: BarChart3 },
+            { id: 'stats' as ViewMode, label: '数据统计与概览', icon: PieChart },
+          ].map(({ id, label, icon: Icon }) => {
+            const isActive = viewMode === id;
+            return (
+              <button
+                key={id}
+                onClick={() => onSelectViewMode(id)}
+                title={label}
+                className={`relative w-full flex items-center ${
+                  isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
+                } py-2.5 rounded-xl text-xs font-medium border transition-all duration-200 ease-out active:scale-[0.98] ${
+                  isActive
+                    ? 'bg-gradient-to-r from-brand-500/15 via-brand-500/10 to-indigo-500/10 dark:from-brand-500/25 dark:to-indigo-500/15 text-brand-600 dark:text-brand-300 border-brand-500/35 dark:border-brand-500/40 font-semibold shadow-sm shadow-brand-500/10'
+                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                {isActive && (
+                  <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-brand-500 shadow-sm shadow-brand-500/50" />
+                )}
+                <Icon
+                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                    isActive ? 'scale-110 text-brand-500 dark:text-brand-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600'
+                  }`}
+                />
+                {!isCollapsed && <span className="truncate">{label}</span>}
+              </button>
+            );
+          })}
         </nav>
       </div>
 

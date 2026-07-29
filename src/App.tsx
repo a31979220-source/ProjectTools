@@ -15,6 +15,18 @@ export function App() {
   const [columns, setColumns] = useState<Column[]>(() => StorageService.getColumns());
   const [activeProjectId, setActiveProjectId] = useState<string>('');
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
+  const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
+
+  const handleSelectViewMode = useCallback((newMode: ViewMode) => {
+    setViewMode((prevMode) => {
+      if (prevMode === newMode) return prevMode;
+      const viewOrder: Record<ViewMode, number> = { kanban: 0, gantt: 1, stats: 2 };
+      const prevOrder = viewOrder[prevMode] ?? 0;
+      const nextOrder = viewOrder[newMode] ?? 0;
+      setSlideDirection(nextOrder >= prevOrder ? 'forward' : 'backward');
+      return newMode;
+    });
+  }, []);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem('pt_sidebar_collapsed_v1') === 'true';
@@ -384,7 +396,7 @@ export function App() {
         }}
         onDeleteProject={handleDeleteProject}
         viewMode={viewMode}
-        onSelectViewMode={setViewMode}
+        onSelectViewMode={handleSelectViewMode}
         theme={theme}
         onToggleTheme={handleToggleTheme}
         onExportBackup={handleExportBackup}
@@ -418,51 +430,58 @@ export function App() {
 
         {/* Dynamic View Router */}
         <main className="flex-1 overflow-hidden relative">
-          {viewMode === 'kanban' && (
-            <KanbanBoard
-              columns={columns}
-              tasks={filteredTasks}
-              localFolderPath={activeProject?.localFolderPath}
-              localFiles={localFiles}
-              isLoadingFiles={isLoadingFiles}
-              onRefreshFiles={fetchLocalFolderFiles}
-              onMoveTask={handleMoveTask}
-              onEditTask={(task) => {
-                setEditingTask(task);
-                setIsTaskModalOpen(true);
-              }}
-              onDeleteTask={handleDeleteTask}
-              onToggleSubtask={handleToggleSubtask}
-              onOpenNewTaskModalForColumn={(colId) => {
-                setEditingTask(null);
-                setDefaultTaskColumnId(colId);
-                setIsTaskModalOpen(true);
-              }}
-              onOpenEditProjectModal={() => {
-                if (activeProject) {
-                  setEditingProject(activeProject);
-                  setIsProjectModalOpen(true);
-                }
-              }}
-              onImportFileAsTask={handleImportFileAsTask}
-              onReorderColumns={handleReorderColumns}
-            />
-          )}
+          <div
+            key={viewMode}
+            className={`w-full h-full ${
+              slideDirection === 'forward' ? 'animate-view-slide-forward' : 'animate-view-slide-backward'
+            }`}
+          >
+            {viewMode === 'kanban' && (
+              <KanbanBoard
+                columns={columns}
+                tasks={filteredTasks}
+                localFolderPath={activeProject?.localFolderPath}
+                localFiles={localFiles}
+                isLoadingFiles={isLoadingFiles}
+                onRefreshFiles={fetchLocalFolderFiles}
+                onMoveTask={handleMoveTask}
+                onEditTask={(task) => {
+                  setEditingTask(task);
+                  setIsTaskModalOpen(true);
+                }}
+                onDeleteTask={handleDeleteTask}
+                onToggleSubtask={handleToggleSubtask}
+                onOpenNewTaskModalForColumn={(colId) => {
+                  setEditingTask(null);
+                  setDefaultTaskColumnId(colId);
+                  setIsTaskModalOpen(true);
+                }}
+                onOpenEditProjectModal={() => {
+                  if (activeProject) {
+                    setEditingProject(activeProject);
+                    setIsProjectModalOpen(true);
+                  }
+                }}
+                onImportFileAsTask={handleImportFileAsTask}
+                onReorderColumns={handleReorderColumns}
+              />
+            )}
 
-          {viewMode === 'gantt' && (
-            <GanttView
-              tasks={filteredTasks}
-              columns={columns}
-              onEditTask={(task) => {
-                setEditingTask(task);
-                setIsTaskModalOpen(true);
-              }}
-            />
-          )}
+            {viewMode === 'gantt' && (
+              <GanttView
+                tasks={filteredTasks}
+                columns={columns}
+                onEditTask={(task) => {
+                  setEditingTask(task);
+                  setIsTaskModalOpen(true);
+                }}
+              />
+            )}
 
-          {viewMode === 'stats' && (
-            <StatsView tasks={activeProjectTasks} columns={columns} />
-          )}
+            {viewMode === 'stats' && (
+              <StatsView tasks={activeProjectTasks} columns={columns} />
+            )}
+          </div>
         </main>
       </div>
 
