@@ -32,6 +32,8 @@ export function App() {
     return localStorage.getItem('pt_sidebar_collapsed_v1') === 'true';
   });
 
+
+
   const handleToggleSidebarCollapse = () => {
     setIsSidebarCollapsed((prev) => {
       const next = !prev;
@@ -432,9 +434,8 @@ export function App() {
         <main className="flex-1 overflow-hidden relative">
           <div
             key={viewMode}
-            className={`w-full h-full ${
-              slideDirection === 'forward' ? 'animate-view-slide-forward' : 'animate-view-slide-backward'
-            }`}
+            className={`w-full h-full ${slideDirection === 'forward' ? 'animate-view-slide-forward' : 'animate-view-slide-backward'
+              }`}
           >
             {viewMode === 'kanban' && (
               <KanbanBoard
