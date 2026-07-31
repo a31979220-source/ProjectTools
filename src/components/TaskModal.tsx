@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task, Column, Priority, SubTask, LocalFileItem } from '../types/project';
+import { PrioritySelect } from './PrioritySelect';
 import { X, Plus, Trash2, Tag as TagIcon, Calendar, CheckSquare, Flag, Folder } from 'lucide-react';
 
 interface TaskModalProps {
@@ -253,16 +254,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
                 <Flag className="w-3.5 h-3.5 text-amber-500" /> 优先级
               </label>
-              <select
+              <PrioritySelect
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
-              >
-                <option value="urgent">🔴 紧急 (Urgent)</option>
-                <option value="high">🟠 高 (High)</option>
-                <option value="medium">🟡 中 (Medium)</option>
-                <option value="low">🔵 低 (Low)</option>
-              </select>
+                onChange={setPriority}
+                size="md"
+                className="w-full justify-between py-2 px-3 rounded-xl text-xs"
+              />
             </div>
           </div>
 

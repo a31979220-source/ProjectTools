@@ -1,6 +1,7 @@
 import React from 'react';
 import { Task, Priority } from '../types/project';
 import { OpenWithMenu } from './OpenWithMenu';
+import { PrioritySelect } from './PrioritySelect';
 import { Calendar, CheckSquare, Clock, Tag as TagIcon, Trash2, Edit3, AlertCircle, FolderOpen } from 'lucide-react';
 
 interface TaskCardProps {
@@ -9,15 +10,9 @@ interface TaskCardProps {
   onDelete: (taskId: string) => void;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
+  onChangePriority?: (taskId: string, priority: Priority) => void;
   viewMode?: 'grid' | 'details' | 'tiles';
 }
-
-const PRIORITY_CONFIG: Record<Priority, { label: string; bg: string; text: string; border: string }> = {
-  urgent: { label: '紧急', bg: 'bg-rose-500/10', text: 'text-rose-500', border: 'border-rose-500/30' },
-  high: { label: '高', bg: 'bg-amber-500/10', text: 'text-amber-500', border: 'border-amber-500/30' },
-  medium: { label: '中', bg: 'bg-blue-500/10', text: 'text-blue-500', border: 'border-blue-500/30' },
-  low: { label: '低', bg: 'bg-slate-500/10', text: 'text-slate-400', border: 'border-slate-500/30' },
-};
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -25,11 +20,19 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onDelete,
   onToggleSubtask,
   onDragStart,
+  onChangePriority,
   viewMode = 'grid',
 }) => {
   const completedSubtasks = task.subtasks.filter((st) => st.completed).length;
   const totalSubtasks = task.subtasks.length;
-  const priorityInfo = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
+
+  const handlePriorityChange = (newPriority: Priority) => {
+    if (onChangePriority) {
+      onChangePriority(task.id, newPriority);
+    } else {
+      onEdit({ ...task, priority: newPriority, updatedAt: new Date().toISOString() });
+    }
+  };
 
   // Check if overdue
   const isOverdue = task.dueDate && new Date(task.dueDate).getTime() < new Date().setHours(0,0,0,0) && task.columnId !== 'done';
@@ -46,11 +49,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         {/* Header: Priority + Title + Actions */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span
-              className={`px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 border ${priorityInfo.bg} ${priorityInfo.text} ${priorityInfo.border}`}
-            >
-              {priorityInfo.label}
-            </span>
+            <PrioritySelect
+              value={task.priority}
+              onChange={handlePriorityChange}
+              size="xs"
+              className="shrink-0"
+            />
             <h3
               onClick={() => onEdit(task)}
               className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-brand-500 cursor-pointer transition"
@@ -154,11 +158,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500/50 rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing flex flex-col gap-2"
       >
         <div className="flex items-center justify-between">
-          <span
-            className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${priorityInfo.bg} ${priorityInfo.text} ${priorityInfo.border}`}
-          >
-            {priorityInfo.label}
-          </span>
+          <PrioritySelect
+            value={task.priority}
+            onChange={handlePriorityChange}
+            size="xs"
+          />
           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
             <button
               onClick={() => onEdit(task)}
@@ -223,11 +227,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     >
       {/* Top Header: Priority Badge + Actions */}
       <div className="flex items-center justify-between mb-2">
-        <span
-          className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase border ${priorityInfo.bg} ${priorityInfo.text} ${priorityInfo.border}`}
-        >
-          {priorityInfo.label}
-        </span>
+        <PrioritySelect
+          value={task.priority}
+          onChange={handlePriorityChange}
+          size="sm"
+        />
 
         <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
           <button

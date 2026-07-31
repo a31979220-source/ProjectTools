@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Project, Task, Column, ViewMode, FilterState, LocalFileItem } from './types/project';
+import { Project, Task, Column, ViewMode, FilterState, LocalFileItem, Priority } from './types/project';
 import { StorageService } from './services/storage';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -211,6 +211,20 @@ export function App() {
         return {
           ...t,
           columnId: targetColumnId,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return t;
+    });
+    handleSaveTasks(updated);
+  };
+
+  const handleChangeTaskPriority = (taskId: string, priority: Priority) => {
+    const updated = tasks.map((t) => {
+      if (t.id === taskId) {
+        return {
+          ...t,
+          priority,
           updatedAt: new Date().toISOString(),
         };
       }
@@ -451,6 +465,7 @@ export function App() {
                   setIsTaskModalOpen(true);
                 }}
                 onDeleteTask={handleDeleteTask}
+                onChangeTaskPriority={handleChangeTaskPriority}
                 onToggleSubtask={handleToggleSubtask}
                 onOpenNewTaskModalForColumn={(colId) => {
                   setEditingTask(null);

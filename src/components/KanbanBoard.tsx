@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Task, Column, LocalFileItem } from '../types/project';
+import { Task, Column, LocalFileItem, Priority } from '../types/project';
 import { TaskCard } from './TaskCard';
 import { OpenWithMenu } from './OpenWithMenu';
 import { 
@@ -29,6 +29,7 @@ interface KanbanBoardProps {
   onMoveTask: (taskId: string, targetColumnId: string) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
+  onChangeTaskPriority?: (taskId: string, priority: Priority) => void;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onOpenNewTaskModalForColumn: (columnId: string) => void;
   onOpenEditProjectModal: () => void;
@@ -48,6 +49,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onMoveTask,
   onEditTask,
   onDeleteTask,
+  onChangeTaskPriority,
   onToggleSubtask,
   onOpenNewTaskModalForColumn,
   onOpenEditProjectModal,
@@ -619,6 +621,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           task={task}
                           onEdit={onEditTask}
                           onDelete={onDeleteTask}
+                          onChangePriority={onChangeTaskPriority}
                           onToggleSubtask={onToggleSubtask}
                           onDragStart={handleTaskDragStart}
                           viewMode={colViewMode}
@@ -738,6 +741,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           task={task}
                           onEdit={onEditTask}
                           onDelete={onDeleteTask}
+                          onChangePriority={onChangeTaskPriority}
                           onToggleSubtask={onToggleSubtask}
                           onDragStart={handleTaskDragStart}
                           viewMode={colViewMode}
