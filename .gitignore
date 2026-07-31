@@ -39,3 +39,7 @@ Desktop.ini
 *.tmp
 *.temp
 .cache/
+
+# Agent local configuration
+.agents/
+
