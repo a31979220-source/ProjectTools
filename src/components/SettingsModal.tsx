@@ -12,8 +12,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
-  Download,
-  Sparkles,
 } from 'lucide-react';
 import { ToastType } from './Toast';
 import { checkRemoteUpdate, UpdateCheckResult } from '../config/version';
@@ -163,9 +161,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         style={{ transformOrigin: 'center center' }}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-gradient-to-r from-brand-500/8 via-brand-500/4 to-transparent">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="p-2 rounded-xl bg-brand-500/10 text-brand-500 border border-brand-500/20 shrink-0">
+            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
               <SettingsIcon className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -191,20 +189,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* 1. Theme */}
           <section>
             <div className="flex items-center gap-1.5 mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-brand-500" />
               <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
                 外观主题
               </h4>
             </div>
             <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div
-                  className={`p-2 rounded-lg border shrink-0 ${
-                    theme === 'dark'
-                      ? 'bg-slate-900 text-amber-300 border-slate-700'
-                      : 'bg-white text-indigo-500 border-slate-200'
-                  }`}
-                >
+                <div className="p-2 rounded-lg border shrink-0 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700">
                   {theme === 'dark' ? (
                     <Moon className="w-4 h-4" />
                   ) : (
@@ -227,11 +218,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               >
                 {theme === 'dark' ? (
                   <>
-                    <Sun className="w-3.5 h-3.5 text-amber-400" /> 切换为浅色
+                    <Sun className="w-3.5 h-3.5 text-slate-500" /> 切换为浅色
                   </>
                 ) : (
                   <>
-                    <Moon className="w-3.5 h-3.5 text-indigo-500" /> 切换为深色
+                    <Moon className="w-3.5 h-3.5 text-slate-500" /> 切换为深色
                   </>
                 )}
               </button>
@@ -241,7 +232,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* 2. Download Path */}
           <section>
             <div className="flex items-center gap-1.5 mb-2.5">
-              <Download className="w-3.5 h-3.5 text-emerald-500" />
               <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
                 自选下载路径
               </h4>
@@ -251,12 +241,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {downloadPath ? (
                 <>
                   <div className="flex items-start gap-2 px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-[11px]">
-                    <FolderInput className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                    <FolderInput className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="text-slate-700 dark:text-slate-200 truncate" title={downloadPath}>
                         {displayPath}
                       </div>
-                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1 font-sans">
+                      <div className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-sans">
                         <CheckCircle2 className="w-3 h-3" />
                         已启用 · 所有导出文件将自动保存到此目录
                       </div>
@@ -269,12 +259,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition active:scale-95"
                       title="在资源管理器中打开此目录"
                     >
-                      <FolderOpen className="w-3.5 h-3.5 text-brand-500" /> 打开
+                      <FolderOpen className="w-3.5 h-3.5 text-slate-500" /> 打开
                     </button>
                     <button
                       type="button"
                       onClick={handleSelectDownloadFolder}
-                      className="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white shadow-sm shadow-brand-500/20 transition active:scale-95"
+                      className="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow-sm transition active:scale-95"
                       title="重新选择下载目录"
                     >
                       <FolderInput className="w-3.5 h-3.5" /> 更改
@@ -282,7 +272,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={handleClearDownloadFolder}
-                      className="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/30 transition active:scale-95"
+                      className="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 border border-slate-200 dark:border-slate-700 transition active:scale-95"
                       title="恢复为浏览器默认下载行为"
                     >
                       <Trash2 className="w-3.5 h-3.5" /> 清除
@@ -302,7 +292,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={handleSelectDownloadFolder}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white shadow-sm shadow-brand-500/20 transition active:scale-95"
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow-sm transition active:scale-95"
                   >
                     <FolderInput className="w-3.5 h-3.5" /> 选择默认下载目录
                   </button>
@@ -314,7 +304,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* 3. Check Update */}
           <section>
             <div className="flex items-center gap-1.5 mb-2.5">
-              <RefreshCw className="w-3.5 h-3.5 text-brand-500" />
               <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
                 软件更新
               </h4>
@@ -328,28 +317,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition active:scale-95 disabled:opacity-70"
               >
                 <RefreshCw
-                  className={`w-3.5 h-3.5 text-brand-500 ${isCheckingUpdate ? 'animate-spin' : ''}`}
+                  className={`w-3.5 h-3.5 text-slate-500 ${isCheckingUpdate ? 'animate-spin' : ''}`}
                 />
                 {isCheckingUpdate ? '正在检查最新版本...' : '检查软件最新版本'}
               </button>
 
               {updateResult && !updateResult.error && !updateResult.hasUpdate && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-600 dark:text-emerald-400">
+                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>当前已是最新版本 (v{updateResult.currentVersion})</span>
                 </div>
               )}
 
               {updateResult?.error && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[11px] text-rose-600 dark:text-rose-400">
+                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>{updateResult.error}</span>
                 </div>
               )}
 
               {updateResult?.hasUpdate && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-brand-500/10 border border-brand-500/20 text-[11px] text-brand-600 dark:text-brand-400">
-                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
+                  <Info className="w-3.5 h-3.5 shrink-0" />
                   <span>发现新版本 v{updateResult.remoteVersion}，建议立即更新</span>
                 </div>
               )}
@@ -362,7 +351,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={handleClose}
-            className="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white shadow-sm shadow-brand-500/25 transition active:scale-95"
+            className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow-sm transition active:scale-95"
           >
             完成
           </button>

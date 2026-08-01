@@ -185,7 +185,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
           e.stopPropagation();
           handleOpen('default');
         }}
-        className={`bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 rounded-l-lg text-slate-700 dark:text-slate-200 font-medium transition flex items-center gap-1 border border-r-0 border-slate-200 dark:border-slate-700 ${
+        className={`bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 rounded-l-lg text-slate-700 dark:text-slate-200 font-medium transition flex items-center gap-1 border border-r-0 border-slate-200 dark:border-slate-700 ${
           size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'
         }`}
         title="系统默认方式打开"
@@ -197,7 +197,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
       {/* Dropdown Toggle Button */}
       <button
         onClick={handleToggleMenu}
-        className={`bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 rounded-r-lg text-slate-600 dark:text-slate-300 transition border border-l-slate-300/80 dark:border-l-slate-700 border-slate-200 dark:border-slate-700 ${
+        className={`bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 rounded-r-lg text-slate-600 dark:text-slate-300 transition border border-l-slate-300/80 dark:border-l-slate-700 border-slate-200 dark:border-slate-700 ${
           size === 'sm' ? 'px-1 py-0.5 text-[10px]' : 'px-1.5 py-1 text-[11px]'
         }`}
         title="选择打开方式 (VS Code / Word / 自定义程序等)"
@@ -224,7 +224,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
           <div className="px-3 py-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
             <span>选择打开方式</span>
             {itemType !== 'general' && (
-              <span className="text-[9px] text-brand-500 font-mono">[{itemType.toUpperCase()}]</span>
+              <span className="text-[9px] text-slate-500 font-mono">[{itemType.toUpperCase()}]</span>
             )}
           </div>
 
@@ -341,9 +341,9 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
           <div className="border-t border-slate-100 dark:border-slate-700/60 mt-1 pt-1">
             <button
               onClick={() => handleOpen('other')}
-              className="w-full px-3 py-1.5 text-left text-brand-600 dark:text-brand-400 hover:bg-brand-500/10 flex items-center gap-2 font-semibold transition"
+              className="w-full px-3 py-1.5 text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-semibold transition"
             >
-              <Settings className="w-3.5 h-3.5 text-brand-500" />
+              <Settings className="w-3.5 h-3.5 text-slate-500" />
               <span>选择其他程序打开...</span>
             </button>
             <button

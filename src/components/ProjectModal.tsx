@@ -117,7 +117,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
           {/* Local Folder Selection */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-              <Folder className="w-3.5 h-3.5 text-brand-500" /> 关联本地文件夹
+              <Folder className="w-3.5 h-3.5 text-slate-500" /> 关联本地文件夹
             </label>
 
             <div className="flex gap-2">
@@ -135,7 +135,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               <button
                 type="button"
                 onClick={handleSelectFolder}
-                className="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-sm transition shrink-0 flex items-center gap-1.5"
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl text-xs font-semibold shadow-sm transition shrink-0 flex items-center gap-1.5"
               >
                 <FolderOpen className="w-3.5 h-3.5" /> 选择文件夹
               </button>
@@ -144,7 +144,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setLocalFolderPath('')}
-                  className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-semibold border border-rose-500/30 transition shrink-0 flex items-center gap-1 shadow-sm"
+                  className="px-3 py-2 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 transition shrink-0 flex items-center gap-1 shadow-sm"
                   title="清除本地文件夹关联"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -187,7 +187,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white shadow-md shadow-brand-500/20 transition"
+              className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow-md transition"
             >
               保存项目
             </button>

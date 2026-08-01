@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div className="p-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shadow-brand-500/20 shrink-0 overflow-hidden">
+          <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-900 shadow-sm shrink-0 overflow-hidden">
             <img src={appLogo} alt="ProjectTools" className="w-full h-full object-cover" />
           </div>
           {!isCollapsed && (
@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </h1>
               <button
                 onClick={() => onOpenVersionModal?.()}
-                className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 font-mono block truncate transition text-left cursor-pointer"
+                className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-mono block truncate transition text-left cursor-pointer"
                 title="点击查看详细版本信息与更新日志"
               >
                 v{APP_VERSION_INFO.version} • 本地桌面版
@@ -174,12 +174,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <>
                 {activeIndex !== -1 && (
                   <div
-                    className="absolute left-0 right-0 h-[38px] rounded-xl bg-gradient-to-r from-brand-500/15 via-brand-500/10 to-indigo-500/10 dark:from-brand-500/25 dark:to-indigo-500/15 border border-brand-500/35 dark:border-brand-500/40 shadow-sm shadow-brand-500/10 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none"
+                    className="absolute left-0 right-0 h-[38px] rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none"
                     style={{
                       transform: `translateY(${activeIndex * 42}px)`,
                     }}
                   >
-                    <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-gradient-to-b from-brand-500 to-indigo-500 shadow-sm shadow-brand-500/60" />
+                    <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-slate-900 dark:bg-white" />
                   </div>
                 )}
 
@@ -194,14 +194,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
                       } h-[38px] rounded-xl text-xs font-medium border border-transparent transition-all duration-200 active:scale-[0.98] ${
                         isActive
-                          ? 'text-brand-700 dark:text-brand-300 font-semibold'
+                          ? 'text-slate-900 dark:text-white font-semibold'
                           : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
                       <Icon
                         className={`w-4 h-4 shrink-0 transition-all duration-300 ease-out ${
                           isActive
-                            ? 'scale-110 text-brand-600 dark:text-brand-400 drop-shadow-[0_1px_3px_rgba(59,130,246,0.35)]'
+                            ? 'scale-110 text-slate-900 dark:text-white'
                             : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 group-hover:scale-105'
                         }`}
                       />
@@ -281,7 +281,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           setDeletingProject(proj);
                         }}
                         title="删除项目"
-                        className="p-1 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-lg transition"
+                        className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -301,9 +301,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="absolute bottom-full left-3 right-3 mb-2 opacity-0 pointer-events-none group-hover/progress:opacity-100 group-hover/progress:pointer-events-auto transition-all duration-200 ease-out z-50 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-2xl p-3.5 shadow-xl space-y-3 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
               <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-brand-500" /> 项目进度与统计明细
+                <TrendingUp className="w-3.5 h-3.5 text-slate-500" /> 项目进度与统计明细
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-500 font-bold border border-brand-500/20">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border border-slate-200 dark:border-slate-700">
                 {totalTasksCount === 0 ? 0 : Math.round((completedTasksCount / totalTasksCount) * 100)}% 完成
               </span>
             </div>
@@ -347,19 +347,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 任务优先级概览
               </div>
               <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
-                <div className="bg-rose-500/10 text-rose-500 border border-rose-500/20 p-1 rounded-lg">
+                <div className="bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 p-1 rounded-lg">
                   <div className="font-bold">紧急</div>
                   <div className="font-mono text-xs">{urgentCount}</div>
                 </div>
-                <div className="bg-amber-500/10 text-amber-500 border border-amber-500/20 p-1 rounded-lg">
+                <div className="bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 p-1 rounded-lg">
                   <div className="font-bold">高</div>
                   <div className="font-mono text-xs">{highCount}</div>
                 </div>
-                <div className="bg-blue-500/10 text-blue-500 border border-blue-500/20 p-1 rounded-lg">
+                <div className="bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 p-1 rounded-lg">
                   <div className="font-bold">中</div>
                   <div className="font-mono text-xs">{mediumCount}</div>
                 </div>
-                <div className="bg-slate-500/10 text-slate-400 border border-slate-500/20 p-1 rounded-lg">
+                <div className="bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 p-1 rounded-lg">
                   <div className="font-bold">低</div>
                   <div className="font-mono text-xs">{lowCount}</div>
                 </div>
@@ -369,22 +369,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Subtasks Progress & Overdue Warnings */}
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
               <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-medium">
-                <CheckSquare className="w-3.5 h-3.5 text-brand-500" /> 子任务: {completedSubtasks}/{totalSubtasks}
+                <CheckSquare className="w-3.5 h-3.5 text-slate-500" /> 子任务: {completedSubtasks}/{totalSubtasks}
               </span>
               {overdueCount > 0 ? (
-                <span className="flex items-center gap-1 text-rose-500 font-bold animate-pulse">
+                <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300 font-bold">
                   <AlertCircle className="w-3.5 h-3.5" /> 逾期 {overdueCount} 项
                 </span>
               ) : (
-                <span className="text-[10px] text-emerald-500 font-semibold">无逾期任务</span>
+                <span className="text-[10px] text-slate-500 font-semibold">无逾期任务</span>
               )}
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 border border-[#eeeeee] dark:border-slate-800 shadow-xs cursor-pointer hover:border-brand-500/40 transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 border border-[#eeeeee] dark:border-slate-800 shadow-xs cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-all">
             <div className="flex items-center justify-between text-xs mb-1.5 text-slate-700 dark:text-slate-300">
               <span className="flex items-center gap-1.5 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> 总完成进度
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500" /> 总完成进度
               </span>
               <span className="font-bold text-slate-900 dark:text-slate-200">
                 {totalTasksCount === 0 ? 0 : Math.round((completedTasksCount / totalTasksCount) * 100)}%
@@ -392,7 +392,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-brand-500 to-emerald-400 transition-all duration-500"
+                className="h-full bg-slate-900 dark:bg-white transition-all duration-500"
                 style={{
                   width: `${totalTasksCount === 0 ? 0 : (completedTasksCount / totalTasksCount) * 100}%`,
                 }}
@@ -461,7 +461,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title="主题、自选下载路径、检查更新"
                 className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
               >
-                <SettingsIcon className="w-3.5 h-3.5 text-brand-500" /> 设置
+                <SettingsIcon className="w-3.5 h-3.5 text-slate-500" /> 设置
               </button>
             )}
           </>
@@ -473,9 +473,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div
           onMouseDown={handleMouseDownResize}
           title="按住鼠标拖拽无极调节侧边栏宽度"
-          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group/resizer hover:bg-brand-500/40 active:bg-brand-500 transition-colors flex items-center justify-center"
+          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group/resizer hover:bg-slate-400/40 active:bg-slate-500 transition-colors flex items-center justify-center"
         >
-          <div className="w-0.5 h-8 bg-slate-300 dark:bg-slate-700 group-hover/resizer:bg-brand-500 rounded-full transition-colors opacity-0 group-hover/sidebar:opacity-100" />
+          <div className="w-0.5 h-8 bg-slate-300 dark:bg-slate-700 group-hover/resizer:bg-slate-900 dark:group-hover/resizer:bg-white rounded-full transition-colors opacity-0 group-hover/sidebar:opacity-100" />
         </div>
       )}
 

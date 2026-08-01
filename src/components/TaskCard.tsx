@@ -5,10 +5,10 @@ import { PrioritySelect } from './PrioritySelect';
 import { ConfirmModal } from './ConfirmModal';
 import { Calendar, CheckSquare, Clock, Tag as TagIcon, Trash2, Edit3, AlertCircle, FolderOpen, Folder, FileText } from 'lucide-react';
 
-const STATUS_STYLE_CONFIG: Record<string, { 
-  iconColor: string; 
-  bg: string; 
-  text: string; 
+const STATUS_STYLE_CONFIG: Record<string, {
+  iconColor: string;
+  bg: string;
+  text: string;
   border: string;
   cardBg: string;
   cardBorder: string;
@@ -20,34 +20,34 @@ const STATUS_STYLE_CONFIG: Record<string, {
     text: 'text-slate-600 dark:text-slate-300',
     border: 'border-slate-500/20',
     cardBg: 'bg-white hover:bg-slate-50/80 dark:bg-slate-900/90 dark:hover:bg-slate-900',
-    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-brand-500/30 dark:hover:border-brand-500/30',
+    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600',
     cardIndicator: 'border-l-4 border-l-slate-400 dark:border-l-slate-500',
   },
   in_progress: {
-    iconColor: 'text-blue-500 fill-blue-500/20 dark:text-blue-400 dark:fill-blue-400/20',
-    bg: 'bg-blue-500/10 dark:bg-blue-500/15',
-    text: 'text-blue-600 dark:text-blue-400',
-    border: 'border-blue-500/20',
-    cardBg: 'bg-blue-50/30 hover:bg-blue-50/60 dark:bg-blue-950/20 dark:hover:bg-blue-950/35',
-    cardBorder: 'border-blue-100/70 dark:border-blue-900/40 hover:border-blue-300 dark:hover:border-blue-500/50',
+    iconColor: 'text-slate-500 fill-slate-500/20 dark:text-slate-400 dark:fill-slate-400/20',
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-600 dark:text-slate-300',
+    border: 'border-slate-200 dark:border-slate-700',
+    cardBg: 'bg-white hover:bg-slate-50/80 dark:bg-slate-900/90 dark:hover:bg-slate-900',
+    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600',
     cardIndicator: 'border-l-4 border-l-blue-500 dark:border-l-blue-400',
   },
   review: {
-    iconColor: 'text-amber-500 fill-amber-500/20 dark:text-amber-400 dark:fill-amber-400/20',
-    bg: 'bg-amber-500/10 dark:bg-amber-500/15',
-    text: 'text-amber-600 dark:text-amber-400',
-    border: 'border-amber-500/20',
-    cardBg: 'bg-amber-50/30 hover:bg-amber-50/60 dark:bg-amber-950/20 dark:hover:bg-amber-950/35',
-    cardBorder: 'border-amber-100/70 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-500/50',
+    iconColor: 'text-slate-500 fill-slate-500/20 dark:text-slate-400 dark:fill-slate-400/20',
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-600 dark:text-slate-300',
+    border: 'border-slate-200 dark:border-slate-700',
+    cardBg: 'bg-white hover:bg-slate-50/80 dark:bg-slate-900/90 dark:hover:bg-slate-900',
+    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600',
     cardIndicator: 'border-l-4 border-l-amber-500 dark:border-l-amber-400',
   },
   done: {
-    iconColor: 'text-emerald-500 fill-emerald-500/20 dark:text-emerald-400 dark:fill-emerald-400/20',
-    bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    border: 'border-emerald-500/20',
-    cardBg: 'bg-emerald-50/30 hover:bg-emerald-50/60 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/35',
-    cardBorder: 'border-emerald-100/70 dark:border-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-500/50',
+    iconColor: 'text-slate-500 fill-slate-500/20 dark:text-slate-400 dark:fill-slate-400/20',
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-600 dark:text-slate-300',
+    border: 'border-slate-200 dark:border-slate-700',
+    cardBg: 'bg-white hover:bg-slate-50/80 dark:bg-slate-900/90 dark:hover:bg-slate-900',
+    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600',
     cardIndicator: 'border-l-4 border-l-emerald-500 dark:border-l-emerald-400',
   },
 };
@@ -143,7 +143,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             />
             <h3
               onClick={(e) => onEdit(task, e)}
-              className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-brand-500 cursor-pointer transition"
+              className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-slate-900 dark:hover:text-white cursor-pointer transition"
               title={task.title}
             >
               {renderTaskTitleWithStatusIcon(task.title, task.columnId)}
@@ -153,7 +153,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
             <button
               onClick={(e) => onEdit(task, e)}
-              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="编辑任务"
             >
               <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
@@ -163,7 +163,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 e.stopPropagation();
                 setIsDeleteConfirmOpen(true);
               }}
-              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="删除任务"
             >
               <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
@@ -261,7 +261,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
             <button
               onClick={(e) => onEdit(task, e)}
-              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="编辑任务"
             >
               <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
@@ -271,7 +271,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 e.stopPropagation();
                 setIsDeleteConfirmOpen(true);
               }}
-              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="删除任务"
             >
               <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
@@ -281,7 +281,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         <h3
           onClick={() => onEdit(task)}
-          className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-brand-500 cursor-pointer transition"
+          className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-slate-900 dark:hover:text-white cursor-pointer transition"
           title={task.title}
         >
           {renderTaskTitleWithStatusIcon(task.title, task.columnId)}
@@ -294,9 +294,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         )}
 
         {task.associatedPath && (
-          <div className="px-2 py-1 bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-lg text-[10px] font-mono flex items-center justify-between gap-1 border border-brand-500/20">
+          <div className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-mono flex items-center justify-between gap-1 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-1 min-w-0 truncate">
-              <FolderOpen className="w-3 h-3 text-brand-500 shrink-0" />
+              <FolderOpen className="w-3 h-3 text-slate-500 shrink-0" />
               <span className="truncate" title={task.associatedPath}>
                 {task.associatedPath}
               </span>
@@ -332,7 +332,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 transition-all duration-200">
           <button
             onClick={(e) => onEdit(task, e)}
-            className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+            className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
             title="编辑任务"
           >
             <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
@@ -342,7 +342,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               e.stopPropagation();
               setIsDeleteConfirmOpen(true);
             }}
-            className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+            className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
             title="删除任务"
           >
             <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
@@ -361,7 +361,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       {/* Task Title */}
       <h3
         onClick={() => onEdit(task)}
-        className="font-semibold text-xs text-slate-800 dark:text-slate-100 mb-1 leading-snug line-clamp-2 hover:text-brand-500 cursor-pointer transition"
+        className="font-semibold text-xs text-slate-800 dark:text-slate-100 mb-1 leading-snug line-clamp-2 hover:text-slate-900 dark:hover:text-white cursor-pointer transition"
       >
         {task.title}
       </h3>
@@ -410,13 +410,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <div className="mb-2.5 bg-slate-50/80 dark:bg-slate-800/40 p-2.5 rounded-xl border border-slate-200/50 dark:border-slate-800/60">
           <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
             <span className="flex items-center gap-1 font-medium">
-              <CheckSquare className="w-3 h-3 text-brand-500" /> 子任务 ({completedSubtasks}/{totalSubtasks})
+              <CheckSquare className="w-3 h-3 text-slate-500" /> 子任务 ({completedSubtasks}/{totalSubtasks})
             </span>
             <span>{Math.round((completedSubtasks / totalSubtasks) * 100)}%</span>
           </div>
           <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-1.5">
             <div
-              className="h-full bg-brand-500 transition-all duration-300"
+              className="h-full bg-slate-900 dark:bg-white transition-all duration-300"
               style={{ width: `${(completedSubtasks / totalSubtasks) * 100}%` }}
             />
           </div>
@@ -429,13 +429,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   e.stopPropagation();
                   onToggleSubtask(task.id, st.id);
                 }}
-                className="flex items-center gap-1.5 text-[11px] cursor-pointer group/st hover:text-brand-500 transition"
+                className="flex items-center gap-1.5 text-[11px] cursor-pointer group/st hover:text-slate-900 dark:hover:text-white transition"
               >
                 <input
                   type="checkbox"
                   checked={st.completed}
                   onChange={() => {}} // handled by div click
-                  className="rounded text-brand-500 focus:ring-0 cursor-pointer w-3 h-3"
+                  className="rounded text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer w-3 h-3"
                 />
                 <span className={`truncate ${st.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>
                   {st.title}

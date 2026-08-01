@@ -199,7 +199,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               placeholder="请输入清晰的任务标题..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50"
             />
           </div>
 
@@ -213,14 +213,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               placeholder="添加补充细节、设计要点或参考链接..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-none"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50 resize-none"
             />
           </div>
 
           {/* Dropdown for Associated Project Folder / File */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-              <Folder className="w-3.5 h-3.5 text-brand-500" /> 关联项目下的文件 / 目录
+              <Folder className="w-3.5 h-3.5 text-slate-500" /> 关联项目下的文件 / 目录
             </label>
 
             <CustomSelect
@@ -253,7 +253,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setAssociatedPath('')}
-                  className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-lg text-xs font-semibold border border-rose-500/30 transition shrink-0 flex items-center gap-1 font-sans shadow-sm"
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-700 transition shrink-0 flex items-center gap-1 font-sans shadow-sm"
                   title="清除关联"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -282,7 +282,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Flag className="w-3.5 h-3.5 text-amber-500" /> 优先级
+                <Flag className="w-3.5 h-3.5 text-slate-500" /> 优先级
               </label>
               <PrioritySelect
                 value={priority}
@@ -297,27 +297,27 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-brand-500" /> 开始时间
+                <Calendar className="w-3.5 h-3.5 text-slate-500" /> 开始时间
                 <Clock className="w-3 h-3 text-slate-400" />
               </label>
               <input
                 type="datetime-local"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-rose-500" /> 截止时间
+                <Calendar className="w-3.5 h-3.5 text-slate-500" /> 截止时间
                 <Clock className="w-3 h-3 text-slate-400" />
               </label>
               <input
                 type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50"
               />
             </div>
           </div>
@@ -325,7 +325,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           {/* Tags */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-              <TagIcon className="w-3.5 h-3.5 text-emerald-500" /> 标签管理
+              <TagIcon className="w-3.5 h-3.5 text-slate-500" /> 标签管理
             </label>
             <div className="flex gap-2 mb-2">
               <input
@@ -339,7 +339,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     handleAddTag();
                   }
                 }}
-                className="flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+                className="flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50"
               />
               <button
                 type="button"
@@ -353,13 +353,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="px-2 py-0.5 rounded-lg bg-brand-500/10 text-brand-500 text-xs font-medium flex items-center gap-1"
+                  className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium flex items-center gap-1"
                 >
                   #{t}
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(t)}
-                    className="hover:text-rose-500 transition"
+                    className="hover:text-slate-700 dark:hover:text-slate-200 transition"
                   >
                     ×
                   </button>
@@ -371,7 +371,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           {/* Subtasks */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-              <CheckSquare className="w-3.5 h-3.5 text-brand-500" /> 子任务 CheckList
+              <CheckSquare className="w-3.5 h-3.5 text-slate-500" /> 子任务 CheckList
             </label>
             <div className="flex gap-2 mb-2">
               <input
@@ -407,7 +407,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                       type="checkbox"
                       checked={st.completed}
                       onChange={() => handleToggleSubtask(st.id)}
-                      className="rounded text-brand-500 focus:ring-0"
+                      className="rounded text-slate-700 dark:text-slate-300 focus:ring-0"
                     />
                     <span className={`truncate ${st.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>
                       {st.title}
@@ -416,7 +416,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleRemoveSubtask(st.id)}
-                    className="text-slate-400 hover:text-rose-500 transition p-1"
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition p-1"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -436,7 +436,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white shadow-md shadow-brand-500/20 transition"
+              className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow-md transition"
             >
               保存任务
             </button>

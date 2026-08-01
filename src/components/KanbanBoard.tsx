@@ -204,18 +204,18 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   // File extension icon helper
   const getFileIcon = (item: LocalFileItem) => {
-    if (item.isDirectory) return <Folder className="w-5 h-5 text-amber-500 shrink-0" />;
+    if (item.isDirectory) return <Folder className="w-5 h-5 text-slate-500 shrink-0" />;
     const ext = item.extension.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) {
-      return <FileImage className="w-5 h-5 text-purple-500 shrink-0" />;
+      return <FileImage className="w-5 h-5 text-slate-500 shrink-0" />;
     }
     if (['js', 'ts', 'jsx', 'tsx', 'py', 'html', 'css', 'json', 'cpp', 'rs', 'java'].includes(ext)) {
-      return <FileCode className="w-5 h-5 text-blue-500 shrink-0" />;
+      return <FileCode className="w-5 h-5 text-slate-500 shrink-0" />;
     }
     if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
-      return <FileArchive className="w-5 h-5 text-rose-500 shrink-0" />;
+      return <FileArchive className="w-5 h-5 text-slate-500 shrink-0" />;
     }
-    return <FileText className="w-5 h-5 text-emerald-500 shrink-0" />;
+    return <FileText className="w-5 h-5 text-slate-500 shrink-0" />;
   };
 
   return (
@@ -230,7 +230,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <FolderOpen className="w-4 h-4 text-brand-500 shrink-0" />
+                <FolderOpen className="w-4 h-4 text-slate-500 shrink-0" />
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
                   关联工作区: <span className="font-mono font-normal text-slate-500">{localFolderPath}</span>
                 </span>
@@ -244,7 +244,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <div className="relative flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-inner mr-2 select-none w-72">
                   {/* Sliding Active Pill Background */}
                   <div
-                    className="absolute top-1 bottom-1 rounded-lg bg-brand-500 shadow-sm transition-all duration-300 ease-out"
+                    className="absolute top-1 bottom-1 rounded-lg bg-slate-900 dark:bg-white shadow-sm transition-all duration-300 ease-out"
                     style={{
                       left: folderViewMode === 'grid' ? '4px' : folderViewMode === 'details' ? 'calc(33.333% + 1px)' : 'calc(66.666% - 2px)',
                       width: 'calc(33.333% - 3px)',
@@ -298,7 +298,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         localFiles.forEach((f) => onImportFileAsTask(f, 'todo'));
                       }
                     }}
-                    className="px-2.5 py-1 bg-brand-500/15 hover:bg-brand-500 text-brand-500 hover:text-white rounded-lg text-xs font-bold border border-brand-500/30 transition flex items-center gap-1.5"
+                    className="px-2.5 py-1 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-700 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5"
                     title="一键将当前文件夹内的所有文件和目录批量导入为任务"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -333,14 +333,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="w-56 shrink-0 bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-brand-500/50 rounded-xl p-3 flex flex-col justify-between transition-all duration-200 hover:shadow-md group/card cursor-grab active:cursor-grabbing"
+                        className="w-56 shrink-0 bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 rounded-xl p-3 flex flex-col justify-between transition-all duration-200 hover:shadow-md group/card cursor-grab active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5 mb-2 min-w-0">
                           {getFileIcon(item)}
                           <div className="min-w-0 flex-1">
                             <h4
                               onClick={() => handleOpenFile(item.path)}
-                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate group-hover/card:text-brand-500 transition cursor-pointer"
+                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate group-hover/card:text-slate-900 dark:group-hover/card:text-white transition cursor-pointer"
                               title={item.name}
                             >
                               {item.name}
@@ -354,7 +354,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-700/60 text-[10px]">
-                          <span className="text-slate-400 dark:text-slate-400 group-hover/card:text-brand-500 font-medium transition">
+                          <span className="text-slate-400 dark:text-slate-400 group-hover/card:text-slate-900 dark:group-hover/card:text-white font-medium transition">
                             ⋮ 拖拽入看板
                           </span>
 
@@ -367,7 +367,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             />
                             <button
                               onClick={() => onImportFileAsTask(item, 'todo')}
-                              className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20"
+                              className="px-2 py-0.5 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-md font-bold transition border border-slate-200 dark:border-slate-700"
                               title="转为待办任务"
                             >
                               +任务
@@ -397,13 +397,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             key={item.path}
                             draggable
                             onDragStart={(e) => handleFileDragStart(e, item)}
-                            className="hover:bg-brand-500/5 transition cursor-grab active:cursor-grabbing group/row"
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-grab active:cursor-grabbing group/row"
                           >
                             <td className="py-2 px-3">{getFileIcon(item)}</td>
                             <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-100">
                               <span
                                 onClick={() => handleOpenFile(item.path)}
-                                className="hover:text-brand-500 transition cursor-pointer truncate block max-w-xs"
+                                className="hover:text-slate-900 dark:hover:text-white transition cursor-pointer truncate block max-w-xs"
                                 title={item.name}
                               >
                                 {item.name}
@@ -428,7 +428,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 />
                                 <button
                                   onClick={() => onImportFileAsTask(item, 'todo')}
-                                  className="px-2 py-0.5 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-md font-bold transition border border-brand-500/20 text-[10px]"
+                                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-md font-bold transition border border-slate-200 dark:border-slate-700 text-[10px]"
                                   title="转为待办任务"
                                 >
                                   +任务
@@ -448,14 +448,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-brand-500/50 rounded-xl p-2.5 flex items-center justify-between transition-all duration-200 hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
+                        className="bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 rounded-xl p-2.5 flex items-center justify-between transition-all duration-200 hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
                       >
                         <div className="flex items-center gap-2.5 min-w-0 flex-1">
                           {getFileIcon(item)}
                           <div className="min-w-0 flex-1">
                             <h4
                               onClick={() => handleOpenFile(item.path)}
-                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate hover:text-brand-500 transition cursor-pointer"
+                              className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
                               title={item.name}
                             >
                               {item.name}
@@ -489,7 +489,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             </div>
             <button
               onClick={onOpenEditProjectModal}
-              className="px-3 py-1 bg-brand-500/10 hover:bg-brand-500 text-brand-600 hover:text-white dark:text-brand-400 rounded-lg font-bold transition border border-brand-500/20"
+              className="px-3 py-1 bg-slate-100 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg font-bold transition border border-slate-200 dark:border-slate-700"
             >
               + 关联本地项目文件夹
             </button>
@@ -517,7 +517,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onDrop={(e) => handleDrop(e, col.id)}
                 className={`h-[560px] min-w-0 flex flex-col rounded-2xl bg-white/70 dark:bg-slate-900/50 border transition-all duration-200 shadow-xs ${
                   isOver
-                    ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
+                    ? 'border-slate-400 dark:border-slate-500 bg-slate-100 dark:bg-slate-800 ring-2 ring-slate-300 dark:ring-slate-600'
                     : 'border-[#eeeeee] dark:border-slate-800/70'
                 }`}
               >
@@ -545,7 +545,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         title="当前列：大图标模式"
                         className={`p-0.5 rounded transition ${
                           colViewMode === 'grid'
-                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
@@ -556,7 +556,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         title="当前列：详细列表模式"
                         className={`p-0.5 rounded transition ${
                           colViewMode === 'details'
-                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
@@ -567,7 +567,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         title="当前列：平铺列表模式"
                         className={`p-0.5 rounded transition ${
                           colViewMode === 'tiles'
-                            ? 'bg-brand-500 text-white shadow-sm font-bold'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
@@ -580,7 +580,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         e.stopPropagation();
                         onOpenNewTaskModalForColumn(col.id, e);
                       }}
-                      className="group/add p-1.5 hover:bg-brand-500/15 dark:hover:bg-brand-500/20 text-slate-500 hover:text-brand-500 dark:text-slate-400 dark:hover:text-brand-400 rounded-lg transition-all duration-200 active:scale-90 hover:scale-105 shrink-0 border border-transparent hover:border-brand-500/20"
+                      className="group/add p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-lg transition-all duration-200 active:scale-90 hover:scale-105 shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
                       title="在该状态下添加任务"
                     >
                       <Plus className="w-3.5 h-3.5 transition-transform duration-300 group-hover/add:rotate-90" />

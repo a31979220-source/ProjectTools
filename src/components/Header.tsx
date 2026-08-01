@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2">
             <h2 
               onClick={onEditProjectModal}
-              className="text-base font-bold text-slate-800 dark:text-slate-100 truncate cursor-pointer hover:text-brand-500 transition"
+              className="text-base font-bold text-slate-800 dark:text-slate-100 truncate cursor-pointer hover:text-slate-900 dark:hover:text-white transition"
             >
               {activeProject?.name || '选择或新建项目'}
             </h2>
@@ -54,16 +54,16 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={handleOpenFolderInExplorer}
                 title={`在 Windows 资源管理器中打开文件夹: ${activeProject.localFolderPath}`}
-                className="px-2 py-0.5 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-mono font-medium border border-brand-500/20 flex items-center gap-1 transition"
+                className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-mono font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition"
               >
-                <FolderOpen className="w-3 h-3 text-brand-500" />
+                <FolderOpen className="w-3 h-3 text-slate-500" />
                 <span className="truncate max-w-[180px]">{activeProject.localFolderPath}</span>
                 <ExternalLink className="w-2.5 h-2.5 opacity-70" />
               </button>
             ) : (
               <button
                 onClick={onEditProjectModal}
-                className="text-[11px] text-slate-400 hover:text-brand-500 transition flex items-center gap-1 font-medium underline"
+                className="text-[11px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-1 font-medium underline"
               >
                 <FolderOpen className="w-3 h-3" /> 关联文件夹
               </button>
@@ -86,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
             placeholder="搜索任务或描述..."
             value={filterState.searchQuery}
             onChange={(e) => onUpdateFilter({ searchQuery: e.target.value })}
-            className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 rounded-xl border border-[#eeeeee] dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition shadow-2xs"
+            className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 rounded-xl border border-[#eeeeee] dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400/30 transition shadow-2xs"
           />
         </div>
 
@@ -121,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
         {(filterState.searchQuery || filterState.priority !== 'all' || filterState.tag !== 'all') && (
           <button
             onClick={() => onUpdateFilter({ searchQuery: '', priority: 'all', tag: 'all' })}
-            className="text-xs text-slate-500 hover:text-brand-500 transition px-2 py-1 hover:underline"
+            className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition px-2 py-1 hover:underline"
           >
             重置筛选
           </button>
@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Add Task Main Button */}
         <button
           onClick={(e) => onOpenNewTaskModal(e)}
-          className="group flex items-center gap-1.5 px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-sm shadow-brand-500/30 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+          className="group flex items-center gap-1.5 px-4 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
           <span>新建任务</span>

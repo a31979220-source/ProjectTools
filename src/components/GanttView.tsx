@@ -247,7 +247,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-brand-500" /> 项目甘特图 / 时间线视图
+            <Calendar className="w-5 h-5 text-slate-500" /> 项目甘特图 / 时间线视图
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             拖拽任务条时停留在某天可展开小时刻度 · 按住线段拖拽平移 · 拉伸手柄调整起止 · 精确到小时 ({totalDays} 天范围)
@@ -275,8 +275,8 @@ export const GanttView: React.FC<GanttViewProps> = ({
                   key={index}
                   style={getColFlex(index)}
                   className={`text-center py-2 border-r border-slate-200/50 dark:border-slate-800/50 overflow-hidden cursor-default ${
-                    isToday ? 'bg-brand-500/10 text-brand-500 font-bold' : isWeekend ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-400' : 'text-slate-500 dark:text-slate-400'
-                  } ${isExpanded ? 'bg-brand-500/5 dark:bg-brand-500/10' : ''}`}
+                    isToday ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold' : isWeekend ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-400' : 'text-slate-500 dark:text-slate-400'
+                  } ${isExpanded ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}
                 >
                   <div className="font-semibold">{d.getMonth() + 1}/{d.getDate()}</div>
                   {!isExpanded && (
@@ -290,7 +290,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
                       {HOUR_TICKS.map((h) => (
                         <div
                           key={h}
-                          className="flex-1 text-[8px] text-brand-500/80 dark:text-brand-400/80 font-medium border-r border-brand-500/15 dark:border-brand-400/15 last:border-r-0"
+                          className="flex-1 text-[8px] text-slate-400 dark:text-slate-500 font-medium border-r border-slate-200 dark:border-slate-700 last:border-r-0"
                         >
                           {h}
                         </div>
@@ -381,7 +381,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
                           key={i}
                           style={getColFlex(i)}
                           className={`border-r border-slate-100 dark:border-slate-800/40 h-full ${
-                            activeHover === i ? 'bg-brand-500/[0.03] dark:bg-brand-500/[0.06]' : ''
+                            activeHover === i ? 'bg-slate-100 dark:bg-slate-800/50' : ''
                           }`}
                         >
                           {/* Hour grid lines inside expanded column */}
@@ -451,7 +451,7 @@ export const GanttView: React.FC<GanttViewProps> = ({
                               <span className="tracking-wide">{formatDateStr(endDate)}</span>
                             </div>
                             <div className="border-t border-slate-700 pt-1 mt-0.5 text-center">
-                              <span className="text-brand-300 font-bold text-xs">
+                              <span className="text-slate-300 font-bold text-xs">
                                 ⏱ {durationHours >= 24 ? `${Math.floor(durationHours / 24)} 天 ${durationHours % 24 > 0 ? `${durationHours % 24} 小时` : ''}` : `${durationHours} 小时`}
                               </span>
                             </div>

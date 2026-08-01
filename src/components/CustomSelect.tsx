@@ -114,7 +114,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       </div>
       <ChevronDown
         className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${
-          isOpen ? 'rotate-180 text-brand-500' : ''
+          isOpen ? 'rotate-180 text-slate-700 dark:text-slate-200' : ''
         }`}
       />
 
@@ -144,7 +144,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                   onClick={(e) => handleSelectOption(e, opt.value)}
                   className={`w-full px-3 py-1.5 text-left flex items-center justify-between gap-2 font-medium transition-colors duration-150 ${
                     isSelected
-                      ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60'
                   }`}
                 >
@@ -152,7 +152,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                     {opt.icon}
                     <span className="truncate">{opt.label}</span>
                   </div>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-brand-500 shrink-0" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-slate-900 dark:text-white shrink-0" />}
                 </button>
               );
             })}

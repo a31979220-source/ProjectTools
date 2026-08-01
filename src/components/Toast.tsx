@@ -43,9 +43,9 @@ export const Toast: React.FC<ToastProps> = ({
   };
 
   const icons = {
-    success: <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 animate-pulse" />,
-    danger: <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />,
-    info: <Info className="w-4 h-4 text-blue-400 shrink-0" />,
+    success: <CheckCircle2 className="w-4 h-4 text-slate-300 shrink-0 animate-pulse" />,
+    danger: <AlertCircle className="w-4 h-4 text-slate-300 shrink-0" />,
+    info: <Info className="w-4 h-4 text-slate-300 shrink-0" />,
   };
 
   return createPortal(

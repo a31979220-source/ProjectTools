@@ -33,8 +33,8 @@ export const StatsView: React.FC<StatsViewProps> = ({ tasks, columns }) => {
     <div className="h-full p-6 overflow-y-auto bg-slate-50 dark:bg-slate-950 select-none space-y-6">
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:shadow-md hover:border-brand-500/30 transition-all duration-200">
-          <div className="p-3.5 bg-brand-500/10 text-brand-500 rounded-xl shrink-0">
+        <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200">
+          <div className="p-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl shrink-0">
             <Layers className="w-6 h-6" />
           </div>
           <div>
@@ -79,7 +79,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ tasks, columns }) => {
         {/* Status Distribution */}
         <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-6 shadow-xs space-y-5 hover:shadow-md transition-all duration-200">
           <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-brand-500" /> 看板状态分布
+            <BarChart2 className="w-4 h-4 text-slate-500" /> 看板状态分布
           </h4>
           <div className="space-y-3.5">
             {columns.map((col) => {
@@ -152,7 +152,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ tasks, columns }) => {
                 key={tag}
                 className="px-3.5 py-1.5 bg-slate-100/80 dark:bg-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-700/60 flex items-center gap-2"
               >
-                #{tag} <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-brand-500 text-white font-mono font-bold">{count}</span>
+                #{tag} <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-mono font-bold">{count}</span>
               </span>
             ))
           )}
