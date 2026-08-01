@@ -47,6 +47,7 @@ Desktop.ini
 
 # Agent local configuration
 .agents/
+.claude/
 CONVERSATION_HISTORY.md
 
 

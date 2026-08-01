@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(PowerShell -Command \"Remove-Item -Recurse -Force 'd:\\\\workplace\\\\ProjectTools\\\\release\\\\ProjectTools-win32-x64' -ErrorAction SilentlyContinue\")"
-    ]
-  }
-}

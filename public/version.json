@@ -1,15 +1,15 @@
 {
   "appName": "ProjectTools",
-  "version": "1.0.10",
-  "releaseDate": "2026-08-01",
-  "buildNumber": "20260801.v1010",
-  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.10/ProjectTools-Setup-1.0.10.exe",
-  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.10/ProjectTools-Setup-1.0.10.exe",
+  "version": "1.0.12",
+  "releaseDate": "2026-08-02",
+  "buildNumber": "20260802.v1012",
+  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.12/ProjectTools-Setup-1.0.12.exe",
+  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.12/ProjectTools-Setup-1.0.12.exe",
   "features": [
-    "绿色免安装版与安装版全自动在线热更新支持",
-    "新增全自动 Releases CI/CD 发布流与云端极速打包支持",
-    "软件支持应用内极速流式下载更新与静默拉起安装",
-    "软件图标抠图升级，全量消除外围白框实现透明 Alpha 通道",
-    "软件更新弹窗统一经典纯蓝背景与整体极简设计优化"
+    "优化侧边栏应用图标显示，移除多余背景与裁剪",
+    "全面 UI 黑白极简化改造，去除所有非必要彩色装饰",
+    "设置页面去除装饰图标，统一黑白配色",
+    "优先级选择器与统计面板彩色标识优化",
+    "全局交互细节与视觉体验提升"
   ]
 }
