@@ -40,14 +40,6 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
     }
   }, []);
 
-  const [isPortableMode, setIsPortableMode] = useState(false);
-
-  useEffect(() => {
-    if (window.electronAPI?.isPortable) {
-      window.electronAPI.isPortable().then(setIsPortableMode);
-    }
-  }, []);
-
   if (!isOpen) return null;
 
   const hasUpdate = updateResult?.hasUpdate ?? false;
@@ -59,17 +51,14 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   const handleDownload = async () => {
     if (downloadState.downloading) return;
 
+    // 统一使用安装包更新，不再区分绿色版/安装版
     let directUrl = '';
-    if (isPortableMode && remoteInfo?.portableUrl) {
-      directUrl = remoteInfo.portableUrl;
-    } else if (remoteInfo?.setupUrl) {
+    if (remoteInfo?.setupUrl) {
       directUrl = remoteInfo.setupUrl;
     } else if (remoteInfo?.downloadUrl && remoteInfo.downloadUrl.endsWith('.exe')) {
       directUrl = remoteInfo.downloadUrl;
     } else {
-      directUrl = isPortableMode
-        ? `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Portable-v${remoteVersion}.zip`
-        : `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
+      directUrl = `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
     }
 
     if (window.electronAPI?.downloadAndInstallUpdate) {

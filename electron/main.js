@@ -335,14 +335,13 @@ ipcMain.handle('app:is-portable', () => {
   return !isInstalled;
 });
 
-// IPC Handler: Download update installer (.exe or .zip portable) and execute install directly inside app
+// IPC Handler: Download update installer (.exe) and execute install directly inside app
 ipcMain.handle('updater:download-and-install', async (event, url) => {
   if (!url) return { success: false, error: '无效的下载链接' };
 
   try {
     const tempDir = app.getPath('temp');
-    const isZip = url.toLowerCase().includes('.zip');
-    const targetPath = path.join(tempDir, isZip ? 'ProjectTools-Portable-Latest.zip' : 'ProjectTools-Setup-Latest.exe');
+    const targetPath = path.join(tempDir, 'ProjectTools-Setup-Latest.exe');
 
     const downloadFile = (fileUrl, dest, redirectCount = 0) => {
       return new Promise((resolve, reject) => {
@@ -397,56 +396,14 @@ ipcMain.handle('updater:download-and-install', async (event, url) => {
 
     const downloadedPath = await downloadFile(url, targetPath);
 
-    if (isZip) {
-      // Portable Green Edition Update Handling
-      const extractDir = path.join(tempDir, 'ProjectTools-Portable-Extracted');
-      if (fs.existsSync(extractDir)) {
-        await fs.promises.rm(extractDir, { recursive: true, force: true });
-      }
+    // 启动安装包
+    exec(`"${downloadedPath}"`);
 
-      const { execSync, spawn } = require('child_process');
-      execSync(`powershell -Command "Expand-Archive -LiteralPath '${downloadedPath}' -DestinationPath '${extractDir}' -Force"`);
+    setTimeout(() => {
+      app.quit();
+    }, 1200);
 
-      let innerDir = extractDir;
-      const entries = fs.readdirSync(extractDir);
-      if (entries.length === 1 && fs.statSync(path.join(extractDir, entries[0])).isDirectory()) {
-        innerDir = path.join(extractDir, entries[0]);
-      }
-
-      const appDir = path.dirname(app.getPath('exe'));
-      const batPath = path.join(tempDir, 'update_portable_app.bat');
-
-      const batContent = `@echo off
-chcp 65001 > nul
-timeout /t 2 /nobreak > nul
-xcopy "${innerDir}\\*" "${appDir}\\" /E /H /C /I /Y
-start "" "${app.getPath('exe')}"
-del "%~f0"
-`;
-
-      fs.writeFileSync(batPath, batContent, 'utf8');
-
-      const child = spawn('cmd.exe', ['/c', batPath], {
-        detached: true,
-        stdio: 'ignore'
-      });
-      child.unref();
-
-      setTimeout(() => {
-        app.quit();
-      }, 800);
-
-      return { success: true };
-    } else {
-      // Setup Installer .exe Handling
-      exec(`"${downloadedPath}"`);
-
-      setTimeout(() => {
-        app.quit();
-      }, 1200);
-
-      return { success: true };
-    }
+    return { success: true };
   } catch (err) {
     console.error('Error downloading update:', err);
     return { success: false, error: err.message || '下载安装包失败' };
