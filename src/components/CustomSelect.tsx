@@ -17,6 +17,7 @@ interface CustomSelectProps {
   className?: string;
 }
 
+
 export const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
   value,
@@ -113,9 +114,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         <span className="truncate">{selectedOption?.label || placeholder}</span>
       </div>
       <ChevronDown
-        className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${
-          isOpen ? 'rotate-180 text-slate-700 dark:text-slate-200' : ''
-        }`}
+        className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-slate-700 dark:text-slate-200' : ''
+          }`}
       />
 
       {isOpen &&
@@ -131,9 +131,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               minWidth: `${coords.width}px`,
               zIndex: 99999,
             }}
-            className={`bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-xl shadow-xl py-1 text-xs ${
-              isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
-            } overflow-hidden select-none`}
+            className={`bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-xl shadow-xl py-1 text-xs ${isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
+              } overflow-hidden select-none`}
           >
             {options.map((opt) => {
               const isSelected = opt.value === value;
@@ -142,11 +141,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                   key={opt.value}
                   type="button"
                   onClick={(e) => handleSelectOption(e, opt.value)}
-                  className={`w-full px-3 py-1.5 text-left flex items-center justify-between gap-2 font-medium transition-colors duration-150 ${
-                    isSelected
+                  className={`w-full px-3 py-1.5 text-left flex items-center justify-between gap-2 font-medium transition-colors duration-150 ${isSelected
                       ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2 truncate">
                     {opt.icon}
