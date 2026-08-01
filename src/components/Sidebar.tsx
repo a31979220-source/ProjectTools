@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Project, Task, ViewMode } from '../types/project';
+import { ConfirmModal } from './ConfirmModal';
 import appLogo from '../assets/app-icon.png';
 import { 
   Kanban, 
@@ -10,7 +11,6 @@ import {
   Moon, 
   Download, 
   Upload, 
-  HardDrive,
   CheckCircle2,
   Trash2,
   Edit3,
@@ -61,6 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
 }) => {
+  const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   // Statistics for Hover Detailed Information Popover
   const todoCount = activeProjectTasks.filter((t) => t.columnId === 'todo').length;
   const inProgressCount = activeProjectTasks.filter((t) => t.columnId === 'in_progress').length;
@@ -238,12 +239,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm(`确定删除项目 "${proj.name}" 及其所有任务卡片吗？`)) {
-                            onDeleteProject(proj.id);
-                          }
+                          setDeletingProject(proj);
                         }}
                         title="删除项目"
-                        className="p-1 text-slate-400 hover:text-rose-500 transition"
+                        className="p-1 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-lg transition"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -370,16 +369,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Settings & Persistence Footer */}
       <div className="p-2 border-t border-slate-200 dark:border-slate-800 space-y-1.5 shrink-0">
-        {!isCollapsed && (
-          <div className="flex items-center justify-between px-1 text-[11px] text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1">
-              <HardDrive className="w-3.5 h-3.5 text-slate-400" /> 本地化存储
-            </span>
-            <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-mono text-[10px] border border-emerald-300 dark:border-emerald-800/50 font-semibold">
-              100% 离线
-            </span>
-          </div>
-        )}
 
         {isCollapsed ? (
           <div className="flex flex-col items-center space-y-1">
@@ -439,6 +428,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         )}
       </div>
+
+      {/* Delete Project Confirm Modal */}
+      <ConfirmModal
+        isOpen={!!deletingProject}
+        onClose={() => setDeletingProject(null)}
+        onConfirm={() => {
+          if (deletingProject) {
+            onDeleteProject(deletingProject.id);
+            setDeletingProject(null);
+          }
+        }}
+        title="删除项目确认"
+        message={`确定要删除项目 "${deletingProject?.name}" 及其下关联的所有任务卡片吗？此操作无法撤销。`}
+      />
     </aside>
   );
 };

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Project, Task, Column, ViewMode, FilterState, LocalFileItem, Priority } from './types/project';
+import React, { useState, useEffect } from 'react';
+import { Project, Task, Column, Priority, FilterState, LocalFileItem } from './types/project';
 import { StorageService } from './services/storage';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -13,30 +13,24 @@ import { Toast, ToastType } from './components/Toast';
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [columns, setColumns] = useState<Column[]>(() => StorageService.getColumns());
+  const [columns, setColumns] = useState<Column[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string>('');
-  const [viewMode, setViewMode] = useState<ViewMode>('kanban');
-  const handleSelectViewMode = useCallback((newMode: ViewMode) => {
-    setViewMode(newMode);
-  }, []);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
-    return localStorage.getItem('pt_sidebar_collapsed_v1') === 'true';
+  const [viewMode, setViewMode] = useState<'kanban' | 'gantt' | 'stats'>('kanban');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // Filter & Search State
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: '',
+    priority: 'all',
+    tag: 'all',
   });
 
-
-
-  const handleToggleSidebarCollapse = () => {
-    setIsSidebarCollapsed((prev) => {
-      const next = !prev;
-      localStorage.setItem('pt_sidebar_collapsed_v1', String(next));
-      return next;
-    });
-  };
-
-  // Local folder content states
+  // Local Folder Integration State
   const [localFiles, setLocalFiles] = useState<LocalFileItem[]>([]);
-  const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+
+  // Sidebar Collapse State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modal States
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -79,85 +73,57 @@ export function App() {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-  // Filters
-  const [filterState, setFilterState] = useState<FilterState>({
-    searchQuery: '',
-    priority: 'all',
-    tag: 'all',
-  });
-
-  // Initialize Data on Load & Deduplicate Tasks
+  // Initial Load
   useEffect(() => {
     const loadedProjects = StorageService.getProjects();
-    let loadedTasks = StorageService.getTasks();
-    const loadedActiveId = StorageService.getActiveProjectId();
-    const loadedTheme = StorageService.getTheme();
-
-    // Auto deduplicate tasks by projectId + associatedPath/title
-    const seenMap = new Set<string>();
-    const deduplicatedTasks: Task[] = [];
-    let hasDuplicates = false;
-
-    for (const t of loadedTasks) {
-      const key = t.projectId + '::' + (t.associatedPath ? t.associatedPath.toLowerCase() : t.title);
-      if (!seenMap.has(key)) {
-        seenMap.add(key);
-        deduplicatedTasks.push(t);
-      } else {
-        hasDuplicates = true;
-      }
-    }
-
-    if (hasDuplicates) {
-      StorageService.saveTasks(deduplicatedTasks);
-      loadedTasks = deduplicatedTasks;
-    }
+    const loadedTasks = StorageService.getTasks();
+    const loadedColumns = StorageService.getColumns();
+    const loadedActiveProjectId = StorageService.getActiveProjectId();
+    const savedTheme = (localStorage.getItem('app_theme') as 'light' | 'dark') || 'light';
+    const savedViewMode = (localStorage.getItem('app_view_mode') as 'kanban' | 'gantt' | 'stats') || 'kanban';
+    const savedSidebarCollapsed = localStorage.getItem('app_sidebar_collapsed') === 'true';
 
     setProjects(loadedProjects);
     setTasks(loadedTasks);
-    setActiveProjectId(loadedActiveId || loadedProjects[0]?.id || '');
-    setTheme(loadedTheme);
+    setColumns(loadedColumns);
+    setActiveProjectId(loadedActiveProjectId || (loadedProjects[0]?.id ?? ''));
+    setTheme(savedTheme);
+    setViewMode(savedViewMode);
+    setIsSidebarCollapsed(savedSidebarCollapsed);
 
-    // Apply dark class to html document and sync native title bar color immediately on startup
-    if (loadedTheme === 'dark') {
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    if (window.electronAPI?.setTheme) {
-      window.electronAPI.setTheme(loadedTheme);
-    }
   }, []);
 
-  // Active Project Data
-  const activeProject = useMemo(
-    () => projects.find((p) => p.id === activeProjectId),
-    [projects, activeProjectId]
-  );
+  // Sync Local Folder Files when Active Project changes
+  useEffect(() => {
+    fetchLocalFolderFiles();
+  }, [activeProjectId, projects]);
 
-  // Read Local Folder Content when active project changes or localFolderPath changes
-  const fetchLocalFolderFiles = useCallback(async () => {
-    if (activeProject?.localFolderPath && window.electronAPI?.readFolderContent) {
+  const fetchLocalFolderFiles = async () => {
+    const currentProj = projects.find((p) => p.id === activeProjectId);
+    if (!currentProj || !currentProj.localFolderPath) {
+      setLocalFiles([]);
+      return;
+    }
+
+    if (window.electronAPI?.readFolderContent) {
       setIsLoadingFiles(true);
       try {
-        const files = await window.electronAPI.readFolderContent(activeProject.localFolderPath);
+        const files = await window.electronAPI.readFolderContent(currentProj.localFolderPath);
         setLocalFiles(files);
       } catch (err) {
-        console.error('Failed to read local folder files:', err);
-        setLocalFiles([]);
+        console.error('读取本地目录失败:', err);
       } finally {
         setIsLoadingFiles(false);
       }
-    } else {
-      setLocalFiles([]);
     }
-  }, [activeProject?.localFolderPath]);
+  };
 
-  useEffect(() => {
-    fetchLocalFolderFiles();
-  }, [fetchLocalFolderFiles]);
-
-  // Sync state changes to storage
+  // Sync state changes with StorageService
   const handleSaveProjects = (newProjects: Project[]) => {
     setProjects(newProjects);
     StorageService.saveProjects(newProjects);
@@ -168,66 +134,74 @@ export function App() {
     StorageService.saveTasks(newTasks);
   };
 
-  const handleReorderColumns = (newColumns: Column[]) => {
+  const handleSaveColumns = (newColumns: Column[]) => {
     setColumns(newColumns);
     StorageService.saveColumns(newColumns);
   };
 
-  // Toggle Dark/Light Theme
-  const handleToggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-    StorageService.setTheme(nextTheme);
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    if (window.electronAPI?.setTheme) {
-      window.electronAPI.setTheme(nextTheme);
-    }
+  const handleReorderColumns = (newColumns: Column[]) => {
+    handleSaveColumns(newColumns);
+    showToast('看板列顺序配置已保存', 'success');
   };
 
-  // Select Active Project
   const handleSelectProject = (id: string) => {
     setActiveProjectId(id);
     StorageService.setActiveProjectId(id);
   };
 
-  // Active Project Tasks
-  const activeProjectTasks = useMemo(
-    () => tasks.filter((t) => t.projectId === activeProjectId),
-    [tasks, activeProjectId]
+  const handleSelectViewMode = (mode: 'kanban' | 'gantt' | 'stats') => {
+    setViewMode(mode);
+    localStorage.setItem('app_view_mode', mode);
+  };
+
+  const handleToggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    localStorage.setItem('app_theme', nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const handleToggleSidebarCollapse = () => {
+    const nextState = !isSidebarCollapsed;
+    setIsSidebarCollapsed(nextState);
+    localStorage.setItem('app_sidebar_collapsed', String(nextState));
+  };
+
+  // Filter Tasks by Active Project and Filter Controls
+  const activeProjectTasks = tasks.filter((t) => t.projectId === activeProjectId);
+  const activeProject = projects.find((p) => p.id === activeProjectId);
+
+  // Collect available tags across active project tasks
+  const availableTags = Array.from(
+    new Set(activeProjectTasks.flatMap((t) => t.tags || []))
   );
 
-  // Available Tags for Filter
-  const availableTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    activeProjectTasks.forEach((t) => t.tags.forEach((tag) => tagSet.add(tag)));
-    return Array.from(tagSet);
-  }, [activeProjectTasks]);
+  const filteredTasks = activeProjectTasks.filter((task) => {
+    // 1. Search Query
+    if (filterState.searchQuery.trim()) {
+      const q = filterState.searchQuery.toLowerCase();
+      const matchTitle = task.title.toLowerCase().includes(q);
+      const matchDesc = task.description?.toLowerCase().includes(q) || false;
+      const matchTags = task.tags?.some((t) => t.toLowerCase().includes(q)) || false;
+      if (!matchTitle && !matchDesc && !matchTags) return false;
+    }
 
-  // Filtered Tasks for Rendering
-  const filteredTasks = useMemo(() => {
-    return activeProjectTasks.filter((t) => {
-      if (filterState.searchQuery) {
-        const q = filterState.searchQuery.toLowerCase();
-        const matchTitle = t.title.toLowerCase().includes(q);
-        const matchDesc = t.description.toLowerCase().includes(q);
-        if (!matchTitle && !matchDesc) return false;
-      }
+    // 2. Tag Filter
+    if (filterState.tag !== 'all') {
+      if (!task.tags?.includes(filterState.tag)) return false;
+    }
 
-      if (filterState.priority !== 'all' && t.priority !== filterState.priority) {
-        return false;
-      }
+    // 3. Priority Filter
+    if (filterState.priority !== 'all') {
+      if (task.priority !== filterState.priority) return false;
+    }
 
-      if (filterState.tag !== 'all' && !t.tags.includes(filterState.tag)) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [activeProjectTasks, filterState]);
+    return true;
+  });
 
   // Task Operations
   const handleMoveTask = (taskId: string, targetColumnId: string) => {
@@ -258,12 +232,32 @@ export function App() {
     handleSaveTasks(updated);
   };
 
+  const handleUpdateTaskDates = (taskId: string, startDate?: string, dueDate?: string) => {
+    const targetTask = tasks.find((t) => t.id === taskId);
+    const updated = tasks.map((t) => {
+      if (t.id === taskId) {
+        return {
+          ...t,
+          startDate,
+          dueDate,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return t;
+    });
+    handleSaveTasks(updated);
+    if (targetTask) {
+      showToast(`已更新 "${targetTask.title}" 的起止时间`, 'success');
+    }
+  };
+
   const handleSaveTaskData = (taskData: Partial<Task>) => {
     if (taskData.id) {
       const updated = tasks.map((t) =>
         t.id === taskData.id ? ({ ...t, ...taskData } as Task) : t
       );
       handleSaveTasks(updated);
+      showToast(`任务 "${taskData.title}" 已保存`, 'success');
     } else {
       const newTask: Task = {
         id: `task-${Date.now()}`,
@@ -281,6 +275,7 @@ export function App() {
         order: tasks.filter((t) => t.columnId === (taskData.columnId || 'todo')).length,
       };
       handleSaveTasks([...tasks, newTask]);
+      showToast(`任务 "${newTask.title}" 创建成功`, 'success');
     }
   };
 
@@ -290,8 +285,6 @@ export function App() {
     handleSaveTasks(updated);
     if (deletedTask) {
       showToast(`已成功删除任务 "${deletedTask.title}"`, 'success');
-    } else {
-      showToast('任务已删除', 'success');
     }
   };
 
@@ -313,7 +306,6 @@ export function App() {
 
   // Convert a local file item to a task card in a specific column with deduplication
   const handleImportFileAsTask = (file: LocalFileItem, targetColumnId: string = 'todo') => {
-    // Deduplication check: check if task with same associatedPath or title already exists in this project
     const existingTask = tasks.find(
       (t) =>
         t.projectId === activeProjectId &&
@@ -323,11 +315,10 @@ export function App() {
 
     if (existingTask) {
       if (existingTask.columnId !== targetColumnId) {
-        // Move existing task card to the dropped target column
         handleMoveTask(existingTask.id, targetColumnId);
       } else {
         const colName = columns.find((c) => c.id === targetColumnId)?.title || '当前列';
-        alert(`该文件/目录「${file.name}」已存在于看板「${colName}」中，无需重复导入！`);
+        showToast(`该文件/目录「${file.name}」已存在于看板「${colName}」中`, 'info');
       }
       return;
     }
@@ -347,6 +338,7 @@ export function App() {
       order: tasks.filter((t) => t.columnId === targetColumnId).length,
     };
     handleSaveTasks([...tasks, newTask]);
+    showToast(`关联任务 "${file.name}" 创建成功`, 'success');
   };
 
   // Project Operations
@@ -356,6 +348,7 @@ export function App() {
         p.id === projectData.id ? ({ ...p, ...projectData } as Project) : p
       );
       handleSaveProjects(updated);
+      showToast(`项目 "${projectData.name}" 更新成功`, 'success');
     } else {
       const newProj: Project = {
         id: `proj-${Date.now()}`,
@@ -368,16 +361,21 @@ export function App() {
       const updated = [...projects, newProj];
       handleSaveProjects(updated);
       handleSelectProject(newProj.id);
+      showToast(`项目 "${newProj.name}" 创建成功`, 'success');
     }
   };
 
   const handleDeleteProject = (projId: string) => {
+    const deletedProj = projects.find((p) => p.id === projId);
     const updatedProjects = projects.filter((p) => p.id !== projId);
     const updatedTasks = tasks.filter((t) => t.projectId !== projId);
     handleSaveProjects(updatedProjects);
     handleSaveTasks(updatedTasks);
     if (activeProjectId === projId && updatedProjects.length > 0) {
       handleSelectProject(updatedProjects[0].id);
+    }
+    if (deletedProj) {
+      showToast(`已成功删除项目 "${deletedProj.name}"`, 'success');
     }
   };
 
@@ -391,6 +389,7 @@ export function App() {
     a.download = `projecttools_backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast('JSON 数据备份导出成功', 'success');
   };
 
   const handleImportBackup = () => {
@@ -407,9 +406,9 @@ export function App() {
             setProjects(StorageService.getProjects());
             setTasks(StorageService.getTasks());
             setActiveProjectId(StorageService.getActiveProjectId());
-            alert('成功从 JSON 备份文件恢复数据！');
+            showToast('成功从 JSON 备份文件恢复数据！', 'success');
           } else {
-            alert('文件校验失败，格式不合规或已被损坏。');
+            showToast('文件校验失败，格式不合规或已被损坏。', 'danger');
           }
         };
         reader.readAsText(file);
@@ -507,6 +506,7 @@ export function App() {
                 tasks={filteredTasks}
                 columns={columns}
                 onEditTask={(task) => handleEditTaskModal(task)}
+                onUpdateTaskDates={handleUpdateTaskDates}
               />
             )}
 

@@ -16,8 +16,8 @@ export interface Task {
   tags: string[];
   subtasks: SubTask[];
   associatedPath?: string; // Associated local folder or file path for this task
-  startDate?: string; // YYYY-MM-DD
-  dueDate?: string;   // YYYY-MM-DD
+  startDate?: string; // YYYY-MM-DD or YYYY-MM-DDTHH:mm
+  dueDate?: string;   // YYYY-MM-DD or YYYY-MM-DDTHH:mm
   createdAt: string;  // ISO timestamp
   updatedAt: string;  // ISO timestamp
   order: number;

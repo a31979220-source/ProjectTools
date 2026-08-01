@@ -2,7 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Task, Column, Priority, SubTask, LocalFileItem } from '../types/project';
 import { PrioritySelect } from './PrioritySelect';
 import { CustomSelect } from './CustomSelect';
-import { X, Plus, Trash2, Tag as TagIcon, Calendar, CheckSquare, Flag, Folder } from 'lucide-react';
+import { X, Plus, Trash2, Tag as TagIcon, Calendar, Clock, CheckSquare, Flag, Folder } from 'lucide-react';
+
+// Normalize a date string to datetime-local format (YYYY-MM-DDTHH:mm)
+const toDatetimeLocal = (val: string | undefined, fallbackTime: string = '00:00'): string => {
+  if (!val) return '';
+  // Already in datetime-local format
+  if (val.includes('T')) return val.slice(0, 16);
+  // Legacy YYYY-MM-DD format
+  return `${val}T${fallbackTime}`;
+};
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -69,8 +78,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       setColumnId(initialTask.columnId);
       setPriority(initialTask.priority);
       setAssociatedPath(initialTask.associatedPath || '');
-      setStartDate(initialTask.startDate || '');
-      setDueDate(initialTask.dueDate || '');
+      setStartDate(toDatetimeLocal(initialTask.startDate, '00:00'));
+      setDueDate(toDatetimeLocal(initialTask.dueDate, '23:59'));
       setTags(initialTask.tags || []);
       setSubtasks(initialTask.subtasks || []);
     } else {
@@ -283,14 +292,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </div>
           </div>
 
-          {/* Dates */}
+          {/* Dates with Hour Precision */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-brand-500" /> 开始日期
+                <Calendar className="w-3.5 h-3.5 text-brand-500" /> 开始时间
+                <Clock className="w-3 h-3 text-slate-400" />
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
@@ -299,10 +309,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-rose-500" /> 截止日期
+                <Calendar className="w-3.5 h-3.5 text-rose-500" /> 截止时间
+                <Clock className="w-3 h-3 text-slate-400" />
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
