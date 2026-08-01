@@ -1,14 +1,14 @@
 {
   "appName": "ProjectTools",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "releaseDate": "2026-08-02",
-  "buildNumber": "20260802.v1101",
-  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.1/ProjectTools-Setup-1.1.1.exe",
-  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.1/ProjectTools-Setup-1.1.1.exe",
+  "buildNumber": "20260802.v1102",
+  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.2/ProjectTools-Setup-1.1.2.exe",
+  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.2/ProjectTools-Setup-1.1.2.exe",
   "features": [
+    "优化版本升级弹窗 UI 样式，移除顶部突兀白色边框线",
     "支持大图标、详细信息、平铺列表 视图切换时的左右优雅平滑双向滑动动画",
     "缩小工作区与看板视图之间多余的垂直间距空隙",
-    "优化远程版本检查逻辑，优先查询 GitHub/Gitee Release API 接口",
     "全局交互细节与视觉体验提升"
   ]
 }

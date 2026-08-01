@@ -81,7 +81,7 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-backdrop-fade select-none">
-      <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-modal-pop">
+      <div className="bg-white dark:bg-slate-900 border border-slate-800 dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-modal-pop">
         {/* Top Header Banner (Solid Brand Color) */}
         <div className="bg-slate-900 dark:bg-white p-5 text-white dark:text-slate-900 relative overflow-hidden select-none">
           <button
