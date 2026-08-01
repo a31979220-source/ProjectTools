@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Task, Priority } from '../types/project';
 import { OpenWithMenu } from './OpenWithMenu';
 import { PrioritySelect } from './PrioritySelect';
+import { ConfirmModal } from './ConfirmModal';
 import { Calendar, CheckSquare, Clock, Tag as TagIcon, Trash2, Edit3, AlertCircle, FolderOpen, Folder, FileText } from 'lucide-react';
 
 const STATUS_STYLE_CONFIG: Record<string, { 
@@ -106,6 +107,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onChangePriority,
   viewMode = 'grid',
 }) => {
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const completedSubtasks = task.subtasks.filter((st) => st.completed).length;
   const totalSubtasks = task.subtasks.length;
 
@@ -124,6 +126,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   /* ================= DETAILS LIST VIEW MODE ================= */
   if (viewMode === 'details') {
     return (
+      <>
       <div
         draggable
         onDragStart={(e) => onDragStart(e, task.id)}
@@ -147,22 +150,23 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             </h3>
           </div>
 
-          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1 transition-all duration-200 shrink-0">
+          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
             <button
               onClick={(e) => onEdit(task, e)}
-              className="group/btn p-1.5 hover:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg text-slate-400 hover:text-brand-500 border border-transparent hover:border-brand-500/20 transition-all active:scale-90"
+              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="编辑任务"
             >
-              <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
+              <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
             </button>
             <button
-              onClick={() => {
-                if (confirm(`确定删除任务 "${task.title}" 吗？`)) onDelete(task.id);
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDeleteConfirmOpen(true);
               }}
-              className="group/btn p-1.5 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-500/20 transition-all active:scale-90"
+              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="删除任务"
             >
-              <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:-rotate-12 group-hover/btn:scale-110" />
+              <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
             </button>
           </div>
         </div>
@@ -229,6 +233,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           )}
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => onDelete(task.id)}
+        title="删除任务确认"
+        message={`确定要删除任务 "${task.title}" 吗？关联的数据与记录将被永久移除。`}
+      />
+      </>
     );
   }
 
@@ -246,22 +258,23 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             onChange={handlePriorityChange}
             size="xs"
           />
-          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1 transition-all duration-200">
+          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
             <button
               onClick={(e) => onEdit(task, e)}
-              className="group/btn p-1.5 hover:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg text-slate-400 hover:text-brand-500 border border-transparent hover:border-brand-500/20 transition-all active:scale-90"
+              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="编辑任务"
             >
-              <Edit3 className="w-3 h-3 transition-transform duration-200 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
+              <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
             </button>
             <button
-              onClick={() => {
-                if (confirm(`确定删除任务 "${task.title}" 吗？`)) onDelete(task.id);
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDeleteConfirmOpen(true);
               }}
-              className="group/btn p-1.5 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-500/20 transition-all active:scale-90"
+              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               title="删除任务"
             >
-              <Trash2 className="w-3 h-3 transition-transform duration-200 group-hover/btn:-rotate-12 group-hover/btn:scale-110" />
+              <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
             </button>
           </div>
         </div>
@@ -316,27 +329,34 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           size="sm"
         />
 
-        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 transition-all duration-200">
           <button
-            onClick={() => onEdit(task)}
+            onClick={(e) => onEdit(task, e)}
+            className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-500 dark:hover:bg-brand-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-brand-500 shadow-2xs hover:shadow-md hover:shadow-brand-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
             title="编辑任务"
-            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200 transition"
           >
-            <Edit3 className="w-3.5 h-3.5" />
+            <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
           </button>
           <button
-            onClick={() => {
-              if (confirm(`确定删除任务 "${task.title}" 吗？`)) {
-                onDelete(task.id);
-              }
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDeleteConfirmOpen(true);
             }}
+            className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-rose-500 shadow-2xs hover:shadow-md hover:shadow-rose-500/25 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
             title="删除任务"
-            className="p-1 hover:bg-rose-500/10 rounded text-slate-400 hover:text-rose-500 transition"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
           </button>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => onDelete(task.id)}
+        title="删除任务确认"
+        message={`确定要删除任务 "${task.title}" 吗？关联的数据与记录将被永久移除。`}
+      />
 
       {/* Task Title */}
       <h3

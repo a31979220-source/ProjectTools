@@ -8,6 +8,7 @@ import { GanttView } from './components/GanttView';
 import { StatsView } from './components/StatsView';
 import { TaskModal } from './components/TaskModal';
 import { ProjectModal } from './components/ProjectModal';
+import { Toast, ToastType } from './components/Toast';
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -42,6 +43,17 @@ export function App() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultTaskColumnId, setDefaultTaskColumnId] = useState('todo');
   const [taskModalTriggerPos, setTaskModalTriggerPos] = useState<{ x: number; y: number } | null>(null);
+
+  // Toast Global State
+  const [toastState, setToastState] = useState<{ isOpen: boolean; message: string; type: ToastType }>({
+    isOpen: false,
+    message: '',
+    type: 'success',
+  });
+
+  const showToast = (message: string, type: ToastType = 'success') => {
+    setToastState({ isOpen: true, message, type });
+  };
 
   const handleOpenTaskModal = (e?: React.MouseEvent, columnId: string = 'todo') => {
     if (e) {
@@ -273,8 +285,14 @@ export function App() {
   };
 
   const handleDeleteTask = (taskId: string) => {
+    const deletedTask = tasks.find((t) => t.id === taskId);
     const updated = tasks.filter((t) => t.id !== taskId);
     handleSaveTasks(updated);
+    if (deletedTask) {
+      showToast(`已成功删除任务 "${deletedTask.title}"`, 'success');
+    } else {
+      showToast('任务已删除', 'success');
+    }
   };
 
   const handleToggleSubtask = (taskId: string, subtaskId: string) => {
@@ -520,6 +538,16 @@ export function App() {
         onSave={handleSaveProjectData}
         initialProject={editingProject}
       />
+
+      {/* Global Toast Notification */}
+      <Toast
+        isOpen={toastState.isOpen}
+        message={toastState.message}
+        type={toastState.type}
+        onClose={() => setToastState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }
+
+export default App;
