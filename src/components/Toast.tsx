@@ -50,20 +50,25 @@ export const Toast: React.FC<ToastProps> = ({
 
   return createPortal(
     <div
-      onClick={handleClose}
-      style={{ position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 99999 }}
-      className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/90 dark:bg-slate-800/95 text-slate-100 backdrop-blur-md border border-slate-700/80 shadow-2xl text-xs font-semibold select-none cursor-pointer ${
-        isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
-      }`}
+      style={{ position: 'fixed', top: '28px', left: '50%', transform: 'translateX(-50%)', zIndex: 99999, pointerEvents: 'none' }}
+      className="flex items-center justify-center"
     >
-      {icons[type]}
-      <span>{message}</span>
-      <button
+      <div
         onClick={handleClose}
-        className="ml-1 p-0.5 hover:bg-slate-700/60 rounded-md text-slate-400 hover:text-slate-200 transition shrink-0"
+        style={{ pointerEvents: 'auto' }}
+        className={`flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-slate-900/90 dark:bg-slate-800/95 text-slate-100 backdrop-blur-md border border-slate-700/80 shadow-2xl text-xs font-semibold select-none cursor-pointer ${
+          isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
+        }`}
       >
-        <X className="w-3.5 h-3.5" />
-      </button>
+        {icons[type]}
+        <span>{message}</span>
+        <button
+          onClick={handleClose}
+          className="ml-1 p-0.5 hover:bg-slate-700/60 rounded-md text-slate-400 hover:text-slate-200 transition shrink-0"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>,
     document.body
   );

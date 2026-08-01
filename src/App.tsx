@@ -465,6 +465,7 @@ export function App() {
         onToggleCollapse={handleToggleSidebarCollapse}
         sidebarWidth={sidebarWidth}
         onSidebarWidthChange={handleSidebarWidthChange}
+        onShowToast={showToast}
       />
 
       {/* Main Content Area */}

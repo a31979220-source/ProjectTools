@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Project, Task, ViewMode } from '../types/project';
 import { ConfirmModal } from './ConfirmModal';
+import { ToastType } from './Toast';
+import { APP_VERSION_INFO, checkRemoteUpdate } from '../config/version';
+import { VersionModal } from './VersionModal';
 import appLogo from '../assets/app-icon.png';
 import { 
   Kanban, 
@@ -18,7 +21,8 @@ import {
   PanelLeftOpen,
   TrendingUp,
   CheckSquare,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -42,6 +46,7 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   sidebarWidth?: number;
   onSidebarWidthChange?: (width: number) => void;
+  onShowToast?: (message: string, type?: ToastType) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -64,9 +69,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   sidebarWidth = 256,
   onSidebarWidthChange,
+  onShowToast,
 }) => {
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [isResizing, setIsResizing] = useState(false);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+
+  const handleCheckUpdate = async () => {
+    if (isCheckingUpdate) return;
+    setIsCheckingUpdate(true);
+
+    try {
+      const result = await checkRemoteUpdate();
+      setIsCheckingUpdate(false);
+
+      if (result.error) {
+        if (onShowToast) {
+          onShowToast(`⚠️ ${result.error}`, 'danger');
+        }
+      } else if (result.hasUpdate) {
+        if (onShowToast) {
+          onShowToast(`🚀 发现新版本 v${result.remoteVersion} (${result.source})！`, 'info');
+        }
+        setIsVersionModalOpen(true);
+      } else {
+        if (onShowToast) {
+          onShowToast(`🎉 当前已是最新版本 (v${result.currentVersion})`, 'success');
+        }
+      }
+    } catch (e) {
+      setIsCheckingUpdate(false);
+      if (onShowToast) {
+        onShowToast('⚠️ 检查更新失败，请重试', 'danger');
+      }
+    }
+  };
   const currentWidth = isCollapsed ? 64 : sidebarWidth;
 
   const handleMouseDownResize = (e: React.MouseEvent) => {
@@ -137,9 +175,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <h1 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight truncate">
                 ProjectTools
               </h1>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block truncate">
-                v1.0.0 • 本地桌面版
-              </span>
+              <button
+                onClick={() => setIsVersionModalOpen(true)}
+                className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 font-mono block truncate transition text-left cursor-pointer"
+                title="点击查看详细版本信息与更新日志"
+              >
+                v{APP_VERSION_INFO.version} • 本地桌面版
+              </button>
             </div>
           )}
         </div>
@@ -427,6 +469,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
             </button>
+            <button
+              onClick={handleCheckUpdate}
+              title="检查软件最新版本"
+              className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-800 transition"
+            >
+              <RefreshCw className={`w-4 h-4 text-brand-500 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+            </button>
           </div>
         ) : (
           <>
@@ -448,15 +497,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
 
-            <div className="pt-0.5">
+            <div className="grid grid-cols-2 gap-1.5 pt-0.5">
               <button
                 onClick={onToggleTheme}
-                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
+                title={theme === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
+                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
               >
-                <div className="flex items-center gap-2">
-                  {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
-                  <span>{theme === 'dark' ? '切换浅色模式' : '切换深色模式'}</span>
-                </div>
+                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
+                <span>{theme === 'dark' ? '浅色模式' : '深色模式'}</span>
+              </button>
+
+              <button
+                onClick={handleCheckUpdate}
+                disabled={isCheckingUpdate}
+                title="检查软件最新版本"
+                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-brand-500 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+                <span>检查更新</span>
               </button>
             </div>
           </>
@@ -486,6 +544,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
         title="删除项目确认"
         message={`确定要删除项目 "${deletingProject?.name}" 及其下关联的所有任务卡片吗？此操作无法撤销。`}
+      />
+
+      {/* App Version Info Modal */}
+      <VersionModal
+        isOpen={isVersionModalOpen}
+        onClose={() => setIsVersionModalOpen(false)}
       />
     </aside>
   );
