@@ -1,7 +1,7 @@
 {
   "name": "project-tools",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "commonjs",
   "main": "electron/main.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "vite & electron .",
-    "pack:exe": "npm run build && electron-packager . ProjectTools --platform=win32 --arch=x64 --out=release --overwrite --icon=electron/icon.ico --ignore=\"^(dist-app|release|\\.git)\""
+    "pack:exe": "npm run build && electron-packager . ProjectTools --platform=win32 --arch=x64 --out=release --overwrite --icon=electron/icon.ico --ignore=\"^(dist-app|release|\\.git)\"",
+    "pack:setup": "npm run build && electron-builder --win nsis"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -40,11 +41,24 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "package.json"
     ],
     "win": {
-      "target": "portable",
-      "artifactName": "${productName}-Windows-Portable.${ext}"
+      "icon": "electron/icon.ico",
+      "target": [
+        "nsis"
+      ],
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ProjectTools",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     }
   }
 }

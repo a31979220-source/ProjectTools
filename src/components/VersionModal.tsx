@@ -27,12 +27,11 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-backdrop-fade select-none">
       <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-modal-pop">
-        {/* Top Gradient Banner (Teal to Blue) */}
-        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 p-5 text-white relative overflow-hidden">
-          <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
+        {/* Top Header Banner (Solid Brand Color) */}
+        <div className="bg-brand-500 p-5 text-white relative overflow-hidden select-none">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
