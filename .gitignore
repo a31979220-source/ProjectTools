@@ -6,9 +6,14 @@ node_modules/
 dist/
 dist-app/
 dist-electron/
+dist_new/
 release/
+release-new/
 out/
 build/
+
+# Workbuddy
+.workbuddy/
 
 # Logs
 logs

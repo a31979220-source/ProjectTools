@@ -8,7 +8,12 @@ import { GanttView } from './components/GanttView';
 import { StatsView } from './components/StatsView';
 import { TaskModal } from './components/TaskModal';
 import { ProjectModal } from './components/ProjectModal';
+import { SettingsModal } from './components/SettingsModal';
+import { VersionModal } from './components/VersionModal';
 import { Toast, ToastType } from './components/Toast';
+import { checkRemoteUpdate, UpdateCheckResult } from './config/version';
+
+const DOWNLOAD_PATH_STORAGE_KEY = 'app_download_path';
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -17,6 +22,7 @@ export function App() {
   const [activeProjectId, setActiveProjectId] = useState<string>('');
   const [viewMode, setViewMode] = useState<'kanban' | 'gantt' | 'stats'>('kanban');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [downloadPath, setDownloadPath] = useState<string>('');
 
   // Filter & Search State
   const [filterState, setFilterState] = useState<FilterState>({
@@ -38,6 +44,11 @@ export function App() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultTaskColumnId, setDefaultTaskColumnId] = useState('todo');
   const [taskModalTriggerPos, setTaskModalTriggerPos] = useState<{ x: number; y: number } | null>(null);
+
+  // Settings Modal State
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [updateCheckResult, setUpdateCheckResult] = useState<UpdateCheckResult | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   // Toast Global State
   const [toastState, setToastState] = useState<{ isOpen: boolean; message: string; type: ToastType }>({
@@ -83,6 +94,7 @@ export function App() {
     const savedTheme = (localStorage.getItem('app_theme') as 'light' | 'dark') || 'light';
     const savedViewMode = (localStorage.getItem('app_view_mode') as 'kanban' | 'gantt' | 'stats') || 'kanban';
     const savedSidebarCollapsed = localStorage.getItem('app_sidebar_collapsed') === 'true';
+    const savedDownloadPath = localStorage.getItem(DOWNLOAD_PATH_STORAGE_KEY) || '';
 
     const savedSidebarWidth = parseInt(localStorage.getItem('app_sidebar_width') || '256', 10);
     if (!isNaN(savedSidebarWidth) && savedSidebarWidth >= 180 && savedSidebarWidth <= 480) {
@@ -96,6 +108,7 @@ export function App() {
     setTheme(savedTheme);
     setViewMode(savedViewMode);
     setIsSidebarCollapsed(savedSidebarCollapsed);
+    setDownloadPath(savedDownloadPath);
 
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -180,6 +193,37 @@ export function App() {
   const handleSidebarWidthChange = (newWidth: number) => {
     setSidebarWidth(newWidth);
     localStorage.setItem('app_sidebar_width', String(newWidth));
+  };
+
+  const handleChangeDownloadPath = (newPath: string) => {
+    setDownloadPath(newPath);
+    if (newPath) {
+      localStorage.setItem(DOWNLOAD_PATH_STORAGE_KEY, newPath);
+    } else {
+      localStorage.removeItem(DOWNLOAD_PATH_STORAGE_KEY);
+    }
+  };
+
+  // Centralized "check for update" handler reused by SettingsModal + future triggers
+  const handleCheckUpdate = async (): Promise<UpdateCheckResult | null> => {
+    try {
+      const result = await checkRemoteUpdate();
+      setUpdateCheckResult(result);
+      if (!result.error && result.hasUpdate) {
+        setIsSettingsModalOpen(false);
+        setIsUpdateModalOpen(true);
+      }
+      return result;
+    } catch (e) {
+      const errResult: UpdateCheckResult = {
+        hasUpdate: false,
+        currentVersion: '',
+        remoteVersion: '',
+        error: '检查更新失败，请重试',
+      };
+      setUpdateCheckResult(errResult);
+      return errResult;
+    }
   };
 
   // Filter Tasks by Active Project and Filter Controls
@@ -391,13 +435,42 @@ export function App() {
   };
 
   // Export / Import Backup Handlers
-  const handleExportBackup = () => {
+  const handleExportBackup = async () => {
     const jsonStr = StorageService.exportBackup();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const fileName = `projecttools_backup_${new Date().toISOString().slice(0, 10)}.json`;
+
+    // Prefer Electron + custom download folder when available
+    if (window.electronAPI?.saveBackupToPath) {
+      try {
+        const res = await window.electronAPI.saveBackupToPath({
+          content: jsonStr,
+          fileName,
+          customPath: downloadPath || null,
+        });
+        if (res?.success) {
+          showToast(`已保存备份到: ${res.path}`, 'success');
+        } else if (res?.canceled) {
+          // User cancelled the save dialog — no toast needed
+        } else if (res?.error) {
+          showToast(`保存失败: ${res.error}，已回退到浏览器下载`, 'danger');
+          fallbackBrowserDownload(jsonStr, fileName);
+        }
+        return;
+      } catch (err) {
+        console.error('saveBackupToPath failed, fallback to browser download:', err);
+      }
+    }
+
+    // Fallback: browser default download
+    fallbackBrowserDownload(jsonStr, fileName);
+  };
+
+  const fallbackBrowserDownload = (content: string, fileName: string) => {
+    const blob = new Blob([content], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `projecttools_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
     showToast('JSON 数据备份导出成功', 'success');
@@ -454,8 +527,6 @@ export function App() {
         onDeleteProject={handleDeleteProject}
         viewMode={viewMode}
         onSelectViewMode={handleSelectViewMode}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
         onExportBackup={handleExportBackup}
         onImportBackup={handleImportBackup}
         onResetData={handleResetData}
@@ -465,7 +536,8 @@ export function App() {
         onToggleCollapse={handleToggleSidebarCollapse}
         sidebarWidth={sidebarWidth}
         onSidebarWidthChange={handleSidebarWidthChange}
-        onShowToast={showToast}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onOpenVersionModal={() => setIsUpdateModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -551,6 +623,26 @@ export function App() {
         onClose={() => setIsProjectModalOpen(false)}
         onSave={handleSaveProjectData}
         initialProject={editingProject}
+      />
+
+      {/* Settings Modal (主题、自选下载路径、检查更新) */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        downloadPath={downloadPath}
+        onChangeDownloadPath={handleChangeDownloadPath}
+        onShowToast={showToast}
+        onCheckUpdate={handleCheckUpdate}
+        updateResult={updateCheckResult}
+      />
+
+      {/* App Version / Update Modal */}
+      <VersionModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        updateResult={updateCheckResult}
       />
 
       {/* Global Toast Notification */}

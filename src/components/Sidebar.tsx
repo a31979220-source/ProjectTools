@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Project, Task, ViewMode } from '../types/project';
 import { ConfirmModal } from './ConfirmModal';
-import { ToastType } from './Toast';
-import { APP_VERSION_INFO, checkRemoteUpdate, UpdateCheckResult } from '../config/version';
-import { VersionModal } from './VersionModal';
+import { APP_VERSION_INFO } from '../config/version';
 import appLogo from '../assets/app-icon.png';
-import { 
-  Kanban, 
-  BarChart3, 
-  PieChart, 
-  FolderPlus, 
-  Sun, 
-  Moon, 
-  Download, 
-  Upload, 
+import {
+  Kanban,
+  BarChart3,
+  PieChart,
+  FolderPlus,
+  Download,
+  Upload,
   CheckCircle2,
   Trash2,
   Edit3,
@@ -22,7 +18,7 @@ import {
   TrendingUp,
   CheckSquare,
   AlertCircle,
-  RefreshCw
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,8 +31,6 @@ interface SidebarProps {
   onDeleteProject: (id: string) => void;
   viewMode: ViewMode;
   onSelectViewMode: (mode: ViewMode) => void;
-  theme: 'dark' | 'light';
-  onToggleTheme: () => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
   onResetData?: () => void;
@@ -46,7 +40,8 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   sidebarWidth?: number;
   onSidebarWidthChange?: (width: number) => void;
-  onShowToast?: (message: string, type?: ToastType) => void;
+  onOpenSettings?: () => void;
+  onOpenVersionModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -59,8 +54,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDeleteProject,
   viewMode,
   onSelectViewMode,
-  theme,
-  onToggleTheme,
   onExportBackup,
   onImportBackup,
   totalTasksCount,
@@ -69,44 +62,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   sidebarWidth = 256,
   onSidebarWidthChange,
-  onShowToast,
+  onOpenSettings,
+  onOpenVersionModal,
 }) => {
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
-  const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
 
-  const handleCheckUpdate = async () => {
-    if (isCheckingUpdate) return;
-    setIsCheckingUpdate(true);
-
-    try {
-      const result = await checkRemoteUpdate();
-      setIsCheckingUpdate(false);
-      setUpdateResult(result);
-
-      if (result.error) {
-        if (onShowToast) {
-          onShowToast(`⚠️ ${result.error}`, 'danger');
-        }
-      } else if (result.hasUpdate) {
-        if (onShowToast) {
-          onShowToast(`🚀 发现新版本 v${result.remoteVersion}，建议立即更新！`, 'info');
-        }
-        setIsVersionModalOpen(true);
-      } else {
-        if (onShowToast) {
-          onShowToast(`🎉 当前已是最新版本 (v${result.currentVersion})`, 'success');
-        }
-      }
-    } catch (e) {
-      setIsCheckingUpdate(false);
-      if (onShowToast) {
-        onShowToast('⚠️ 检查更新失败，请重试', 'danger');
-      }
-    }
-  };
   const currentWidth = isCollapsed ? 64 : sidebarWidth;
 
   const handleMouseDownResize = (e: React.MouseEvent) => {
@@ -178,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 ProjectTools
               </h1>
               <button
-                onClick={() => setIsVersionModalOpen(true)}
+                onClick={() => onOpenVersionModal?.()}
                 className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 font-mono block truncate transition text-left cursor-pointer"
                 title="点击查看详细版本信息与更新日志"
               >
@@ -464,20 +425,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Upload className="w-4 h-4" />
             </button>
-            <button
-              onClick={onToggleTheme}
-              title={theme === 'dark' ? '浅色模式' : '深色模式'}
-              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
-            </button>
-            <button
-              onClick={handleCheckUpdate}
-              title="检查软件最新版本"
-              className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-800 transition"
-            >
-              <RefreshCw className={`w-4 h-4 text-brand-500 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-            </button>
+            {onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                title="打开应用设置（主题、下载路径、检查更新）"
+                className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-800 transition"
+              >
+                <SettingsIcon className="w-4 h-4 text-brand-500" />
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -499,26 +455,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+            {onOpenSettings && (
               <button
-                onClick={onToggleTheme}
-                title={theme === 'dark' ? '切换为浅色模式' : '切换为深色模式'}
-                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
+                onClick={onOpenSettings}
+                title="主题、自选下载路径、检查更新"
+                className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
               >
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
-                <span>{theme === 'dark' ? '浅色模式' : '深色模式'}</span>
+                <SettingsIcon className="w-3.5 h-3.5 text-brand-500" /> 设置
               </button>
-
-              <button
-                onClick={handleCheckUpdate}
-                disabled={isCheckingUpdate}
-                title="检查软件最新版本"
-                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 text-brand-500 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-                <span>检查更新</span>
-              </button>
-            </div>
+            )}
           </>
         )}
       </div>
@@ -546,13 +491,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
         title="删除项目确认"
         message={`确定要删除项目 "${deletingProject?.name}" 及其下关联的所有任务卡片吗？此操作无法撤销。`}
-      />
-
-      {/* App Version Info Modal */}
-      <VersionModal
-        isOpen={isVersionModalOpen}
-        onClose={() => setIsVersionModalOpen(false)}
-        updateResult={updateResult}
       />
     </aside>
   );

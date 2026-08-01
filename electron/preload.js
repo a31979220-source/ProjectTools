@@ -16,4 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('updater:progress', subscription);
     return () => ipcRenderer.removeListener('updater:progress', subscription);
   },
+  // New: Settings-related APIs (custom download folder, backup saving)
+  selectDownloadFolder: () => ipcRenderer.invoke('settings:select-download-folder'),
+  saveBackupToPath: (payload) => ipcRenderer.invoke('settings:save-backup', payload),
 });

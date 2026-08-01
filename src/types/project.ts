@@ -87,6 +87,15 @@ declare global {
       isPortable: () => Promise<boolean>;
       downloadAndInstallUpdate: (url: string) => Promise<{ success: boolean; error?: string }>;
       onUpdateProgress: (callback: (data: { receivedBytes: number; totalBytes: number; percent: number }) => void) => () => void;
+      // Settings: custom download folder
+      selectDownloadFolder: () => Promise<string | null>;
+      saveBackupToPath: (payload: { content: string; fileName: string; customPath: string | null }) => Promise<{
+        success: boolean;
+        canceled?: boolean;
+        error?: string;
+        path?: string;
+        usedCustomPath?: boolean;
+      }>;
     };
   }
 }

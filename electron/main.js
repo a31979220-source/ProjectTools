@@ -64,6 +64,48 @@ ipcMain.handle('shell:open-folder', async (_, folderPath) => {
   return false;
 });
 
+// IPC Handler: Select a custom download/save folder (used by Settings Modal)
+ipcMain.handle('settings:select-download-folder', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory', 'createDirectory'],
+    title: '选择下载文件的默认保存目录',
+    buttonLabel: '设为默认下载目录',
+  });
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+  return result.filePaths[0];
+});
+
+// IPC Handler: Save backup JSON content to a custom path (or open native save dialog when no custom path)
+ipcMain.handle('settings:save-backup', async (_, { content, fileName, customPath }) => {
+  try {
+    let targetPath = '';
+    if (customPath && fs.existsSync(customPath)) {
+      targetPath = path.join(customPath, fileName);
+      await fs.promises.writeFile(targetPath, content, 'utf8');
+      return { success: true, path: targetPath, usedCustomPath: true };
+    }
+    // Fallback: show native save dialog
+    const result = await dialog.showSaveDialog({
+      title: '保存备份文件',
+      defaultPath: fileName,
+      filters: [
+        { name: 'JSON 备份文件', extensions: ['json'] },
+        { name: '所有文件 (*.*)', extensions: ['*'] },
+      ],
+    });
+    if (result.canceled || !result.filePath) {
+      return { success: false, canceled: true };
+    }
+    await fs.promises.writeFile(result.filePath, content, 'utf8');
+    return { success: true, path: result.filePath, usedCustomPath: false };
+  } catch (err) {
+    console.error('Error saving backup file:', err);
+    return { success: false, error: err.message || '保存备份文件失败' };
+  }
+});
+
 // Permanent File Storage Path in AppData
 const getCustomAppsFilePath = () => {
   const userDataPath = app.getPath('userData');
