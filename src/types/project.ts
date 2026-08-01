@@ -84,6 +84,7 @@ declare global {
       getCustomApps: () => Promise<CustomOpenApp[]>;
       saveCustomApps: (apps: CustomOpenApp[]) => Promise<boolean>;
       setTheme: (theme: 'dark' | 'light') => void;
+      isPortable: () => Promise<boolean>;
       downloadAndInstallUpdate: (url: string) => Promise<{ success: boolean; error?: string }>;
       onUpdateProgress: (callback: (data: { receivedBytes: number; totalBytes: number; percent: number }) => void) => () => void;
     };

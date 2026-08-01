@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getCustomApps: () => ipcRenderer.invoke('store:get-custom-apps'),
   saveCustomApps: (apps) => ipcRenderer.invoke('store:save-custom-apps', apps),
   setTheme: (theme) => ipcRenderer.send('theme:change', theme),
+  isPortable: () => ipcRenderer.invoke('app:is-portable'),
   downloadAndInstallUpdate: (downloadUrl) => ipcRenderer.invoke('updater:download-and-install', downloadUrl),
   onUpdateProgress: (callback) => {
     const subscription = (_, data) => callback(data);

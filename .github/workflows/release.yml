@@ -25,16 +25,20 @@ jobs:
       - name: 安装项目依赖
         run: npm ci
 
-      - name: 构建前端与生成 EXE 安装包
-        run: npm run pack:setup
+      - name: 构建前端、NSIS 安装包及绿色免安装版 ZIP
+        run: |
+          npm run pack:setup
+          npm run pack:exe
+          powershell -Command "Compress-Archive -Path 'release/ProjectTools-win32-x64/*' -DestinationPath \"release/ProjectTools-Portable-${{ github.ref_name }}.zip\" -Force"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 自动发布 GitHub Release 并上传安装包附件
+      - name: 自动发布 GitHub Release 并上传安装包与绿色版附件
         uses: softprops/action-gh-release@v2
         with:
           files: |
             release/ProjectTools-Setup-*.exe
+            release/ProjectTools-Portable-*.zip
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           draft: false

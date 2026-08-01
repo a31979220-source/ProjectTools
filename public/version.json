@@ -4,12 +4,13 @@
   "releaseDate": "2026-08-01",
   "buildNumber": "20260801.v107",
   "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe",
+  "portableUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Portable-v1.0.7.zip",
   "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe",
   "features": [
+    "绿色免安装版与安装版全自动在线热更新支持",
     "新增全自动 Releases CI/CD 发布流与云端极速打包支持",
     "软件支持应用内极速流式下载更新与静默拉起安装",
     "软件图标抠图升级，全量消除外围白框实现透明 Alpha 通道",
-    "软件更新弹窗统一经典纯蓝背景与整体极简设计优化",
-    "【稍后提醒】与【立即下载更新】明确双按键交互设计"
+    "软件更新弹窗统一经典纯蓝背景与整体极简设计优化"
   ]
 }

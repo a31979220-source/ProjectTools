@@ -40,6 +40,14 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
     }
   }, []);
 
+  const [isPortableMode, setIsPortableMode] = useState(false);
+
+  useEffect(() => {
+    if (window.electronAPI?.isPortable) {
+      window.electronAPI.isPortable().then(setIsPortableMode);
+    }
+  }, []);
+
   if (!isOpen) return null;
 
   const hasUpdate = updateResult?.hasUpdate ?? false;
@@ -51,12 +59,22 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   const handleDownload = async () => {
     if (downloadState.downloading) return;
 
-    // Direct exe installer URL link from remoteInfo.setupUrl or GitHub Releases
-    const directExeUrl = remoteInfo?.setupUrl || (remoteInfo?.downloadUrl?.endsWith('.exe') ? remoteInfo.downloadUrl : `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`);
+    let directUrl = '';
+    if (isPortableMode && remoteInfo?.portableUrl) {
+      directUrl = remoteInfo.portableUrl;
+    } else if (remoteInfo?.setupUrl) {
+      directUrl = remoteInfo.setupUrl;
+    } else if (remoteInfo?.downloadUrl && remoteInfo.downloadUrl.endsWith('.exe')) {
+      directUrl = remoteInfo.downloadUrl;
+    } else {
+      directUrl = isPortableMode
+        ? `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Portable-v${remoteVersion}.zip`
+        : `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
+    }
 
     if (window.electronAPI?.downloadAndInstallUpdate) {
       setDownloadState({ downloading: true, percent: 0, receivedMB: '0.0', totalMB: '0.0' });
-      const res = await window.electronAPI.downloadAndInstallUpdate(directExeUrl);
+      const res = await window.electronAPI.downloadAndInstallUpdate(directUrl);
       if (!res.success) {
         setDownloadState({ downloading: false, percent: 0, receivedMB: '0.0', totalMB: '0.0', error: res.error });
         // Fallback to web browser open if direct download fails

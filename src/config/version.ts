@@ -8,6 +8,7 @@ export interface AppVersionInfo {
   author: string;
   description: string;
   setupUrl?: string;
+  portableUrl?: string;
   downloadUrl?: string;
   features: string[];
 }
@@ -22,8 +23,10 @@ export const APP_VERSION_INFO: AppVersionInfo = {
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
   setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe',
+  portableUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Portable-v1.0.7.zip',
   downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe',
   features: [
+    '绿色免安装版与安装版全自动在线热更新支持',
     '新增全自动 Releases CI/CD 发布流与云端极速打包支持',
     '软件支持应用内极速流式下载更新与静默拉起安装',
     '软件图标抠图升级，全量消除外围白框实现透明 Alpha 通道',
