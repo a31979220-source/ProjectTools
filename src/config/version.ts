@@ -14,16 +14,17 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.11',
+  version: '1.0.13',
   releaseDate: '2026-08-02',
-  buildNumber: '20260802.v1011',
+  buildNumber: '20260802.v1013',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.11/ProjectTools-Setup-1.0.11.exe',
-  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.11/ProjectTools-Setup-1.0.11.exe',
+  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.13/ProjectTools-Setup-1.0.13.exe',
+  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.13/ProjectTools-Setup-1.0.13.exe',
   features: [
+    '视图切换按钮优化为下拉框形式，提升操作效率',
     '全面 UI 黑白极简化改造，去除所有非必要彩色装饰',
     '设置页面去除装饰图标，统一黑白配色',
     '优先级选择器与统计面板彩色标识优化',

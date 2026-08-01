@@ -2,20 +2,21 @@ import React, { useState, useRef } from 'react';
 import { Task, Column, LocalFileItem, Priority } from '../types/project';
 import { TaskCard } from './TaskCard';
 import { OpenWithMenu } from './OpenWithMenu';
-import { 
-  Plus, 
-  Layers, 
-  FolderOpen, 
-  FileText, 
-  FileCode, 
-  FileImage, 
-  FileArchive, 
-  Folder, 
+import {
+  Plus,
+  Layers,
+  FolderOpen,
+  FileText,
+  FileCode,
+  FileImage,
+  FileArchive,
+  Folder,
   RefreshCw,
   LayoutGrid,
   GripVertical,
   List,
-  Grid2X2
+  Grid2X2,
+  ChevronDown
 } from 'lucide-react';
 
 interface KanbanBoardProps {
@@ -240,55 +241,52 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                {/* Win11 View Mode Switcher with Smooth Sliding Indicator (Batch Switch All Columns) */}
-                <div className="relative flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-inner mr-2 select-none w-72">
-                  {/* Sliding Active Pill Background */}
-                  <div
-                    className="absolute top-1 bottom-1 rounded-lg bg-slate-900 dark:bg-white shadow-sm transition-all duration-300 ease-out"
-                    style={{
-                      left: folderViewMode === 'grid' ? '4px' : folderViewMode === 'details' ? 'calc(33.333% + 1px)' : 'calc(66.666% - 2px)',
-                      width: 'calc(33.333% - 3px)',
-                    }}
-                  />
-
+                {/* Global View Mode Dropdown */}
+                <div className="relative group/dropdown mr-2">
                   <button
-                    onClick={() => handleSetAllColumnsViewMode('grid')}
-                    title="全局一键设为：大图标模式"
-                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
-                      folderViewMode === 'grid'
-                        ? 'text-white'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                    }`}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 shadow-xs"
                   >
-                    <LayoutGrid className="w-3.5 h-3.5" />
-                    <span>大图标</span>
+                    {folderViewMode === 'grid' && <LayoutGrid className="w-3.5 h-3.5" />}
+                    {folderViewMode === 'details' && <List className="w-3.5 h-3.5" />}
+                    {folderViewMode === 'tiles' && <Grid2X2 className="w-3.5 h-3.5" />}
+                    <span>{folderViewMode === 'grid' ? '大图标' : folderViewMode === 'details' ? '详细信息' : '平铺列表'}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 group-hover/dropdown:text-slate-600 dark:group-hover/dropdown:text-slate-300 transition" />
                   </button>
-
-                  <button
-                    onClick={() => handleSetAllColumnsViewMode('details')}
-                    title="全局一键设为：详细信息列表"
-                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
-                      folderViewMode === 'details'
-                        ? 'text-white'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                    }`}
-                  >
-                    <List className="w-3.5 h-3.5" />
-                    <span>详细信息</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleSetAllColumnsViewMode('tiles')}
-                    title="全局一键设为：平铺列表"
-                    className={`relative z-10 flex-1 flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-bold transition-colors duration-200 rounded-lg active:scale-95 ${
-                      folderViewMode === 'tiles'
-                        ? 'text-white'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                    }`}
-                  >
-                    <Grid2X2 className="w-3.5 h-3.5" />
-                    <span>平铺列表</span>
-                  </button>
+                  <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-200 z-50 py-1">
+                    <button
+                      onClick={() => handleSetAllColumnsViewMode('grid')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                        folderViewMode === 'grid'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span>大图标</span>
+                    </button>
+                    <button
+                      onClick={() => handleSetAllColumnsViewMode('details')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                        folderViewMode === 'details'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <List className="w-3.5 h-3.5" />
+                      <span>详细信息</span>
+                    </button>
+                    <button
+                      onClick={() => handleSetAllColumnsViewMode('tiles')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                        folderViewMode === 'tiles'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Grid2X2 className="w-3.5 h-3.5" />
+                      <span>平铺列表</span>
+                    </button>
+                  </div>
                 </div>
 
                 {localFiles.length > 0 && (
@@ -538,41 +536,52 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    {/* Mini Column Independent Display Mode Switcher */}
-                    <div className="flex items-center bg-white dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
+                    {/* Mini Column Independent Display Mode Dropdown */}
+                    <div className="relative group/col-dropdown">
                       <button
-                        onClick={() => handleSetColumnViewMode(col.id, 'grid')}
-                        title="当前列：大图标模式"
-                        className={`p-0.5 rounded transition ${
-                          colViewMode === 'grid'
-                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
+                        className="flex items-center gap-1 px-1.5 py-1 bg-white dark:bg-slate-800/90 rounded-lg border border-slate-200/80 dark:border-slate-700/60 shadow-xs text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
+                        title="切换视图模式"
                       >
-                        <LayoutGrid className="w-3 h-3" />
+                        {colViewMode === 'grid' && <LayoutGrid className="w-3 h-3" />}
+                        {colViewMode === 'details' && <List className="w-3 h-3" />}
+                        {colViewMode === 'tiles' && <Grid2X2 className="w-3 h-3" />}
+                        <ChevronDown className="w-2.5 h-2.5" />
                       </button>
-                      <button
-                        onClick={() => handleSetColumnViewMode(col.id, 'details')}
-                        title="当前列：详细列表模式"
-                        className={`p-0.5 rounded transition ${
-                          colViewMode === 'details'
-                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
-                      >
-                        <List className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => handleSetColumnViewMode(col.id, 'tiles')}
-                        title="当前列：平铺列表模式"
-                        className={`p-0.5 rounded transition ${
-                          colViewMode === 'tiles'
-                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-bold'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                        }`}
-                      >
-                        <Grid2X2 className="w-3 h-3" />
-                      </button>
+                      <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/col-dropdown:opacity-100 group-hover/col-dropdown:visible transition-all duration-200 z-50 py-1">
+                        <button
+                          onClick={() => handleSetColumnViewMode(col.id, 'grid')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                            colViewMode === 'grid'
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <LayoutGrid className="w-3 h-3" />
+                          <span>大图标</span>
+                        </button>
+                        <button
+                          onClick={() => handleSetColumnViewMode(col.id, 'details')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                            colViewMode === 'details'
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <List className="w-3 h-3" />
+                          <span>详细信息</span>
+                        </button>
+                        <button
+                          onClick={() => handleSetColumnViewMode(col.id, 'tiles')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                            colViewMode === 'tiles'
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <Grid2X2 className="w-3 h-3" />
+                          <span>平铺列表</span>
+                        </button>
+                      </div>
                     </div>
 
                     <button
