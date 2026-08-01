@@ -201,7 +201,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     <div className="h-full flex flex-col overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-950 select-none">
 
       {/* Local Folder Workspace Scanning Area (Win11 File Explorer UI) */}
-      <div className="mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm shrink-0">
+      <div className="mb-6 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-5 shadow-xs shrink-0">
         {localFolderPath ? (
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
@@ -491,14 +491,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onDragOver={(e) => handleDragOver(e, col.id)}
                 onDragLeave={(e) => handleDragLeave(e, col.id)}
                 onDrop={(e) => handleDrop(e, col.id)}
-                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-slate-100/40 dark:bg-slate-900/40 border transition-all duration-200 shadow-xs ${
+                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-white/70 dark:bg-slate-900/50 border transition-all duration-200 shadow-xs ${
                   isOver
                     ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
-                    : 'border-slate-200/60 dark:border-slate-800/60'
+                    : 'border-[#eeeeee] dark:border-slate-800/70'
                 }`}
               >
                 {/* Column Header: Draggable Grip Handle & Independent Display Switcher */}
-                <div className="p-3 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 bg-slate-200/20 dark:bg-slate-800/20 rounded-t-2xl cursor-grab active:cursor-grabbing shrink-0">
+                <div className="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 bg-transparent rounded-t-2xl cursor-grab active:cursor-grabbing shrink-0">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
                     <span

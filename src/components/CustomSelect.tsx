@@ -106,7 +106,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     <div
       ref={buttonRef}
       onClick={handleToggle}
-      className={`relative inline-flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500/40 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer select-none transition-all duration-200 active:scale-98 ${className}`}
+      className={`relative inline-flex items-center justify-between gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 hover:border-brand-500/40 text-xs font-medium text-slate-700 dark:text-slate-200 cursor-pointer select-none transition-all duration-200 shadow-2xs active:scale-98 ${className}`}
     >
       <div className="flex items-center gap-1.5 min-w-0 truncate">
         {icon}
@@ -131,7 +131,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               minWidth: `${coords.width}px`,
               zIndex: 99999,
             }}
-            className={`bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1 text-xs ${
+            className={`bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-xl shadow-xl py-1 text-xs ${
               isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
             } overflow-hidden select-none`}
           >

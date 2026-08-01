@@ -90,12 +90,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside
       className={`${
         isCollapsed ? 'w-16' : 'w-64'
-      } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative z-30 select-none`}
+      } bg-slate-50/70 dark:bg-slate-950/70 flex flex-col transition-all duration-300 relative z-30 select-none`}
     >
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+      <div className="p-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0 overflow-hidden">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shadow-brand-500/20 shrink-0 overflow-hidden">
             <img src={appLogo} alt="ProjectTools" className="w-full h-full object-cover" />
           </div>
           {!isCollapsed && (
@@ -113,14 +113,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onToggleCollapse}
           title={isCollapsed ? '展开侧边栏' : '折叠侧边栏'}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-800/60 transition"
         >
           {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
       </div>
 
       {/* Navigation Links */}
-      <div className="p-2 border-b border-slate-200 dark:border-slate-800">
+      <div className="p-2.5">
         <nav className="relative space-y-1">
           {/* Active Sliding Background Pill & Left Glowing Bar */}
           {(() => {
@@ -209,10 +209,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={proj.id}
                 onClick={() => onSelectProject(proj.id)}
                 title={proj.name}
-                className={`group flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between px-3 py-2'} rounded-xl text-xs font-medium cursor-pointer border transition-colors duration-150 ${
+                className={`group flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between px-3 py-2'} rounded-xl text-xs font-medium cursor-pointer border transition-all duration-150 ${
                   isActive
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 shadow-sm font-semibold'
-                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-[#eeeeee] dark:border-slate-800 shadow-xs font-semibold'
+                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-900/40 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -257,9 +257,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Progress Card with Detailed Information Hover Popover */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40 shrink-0 relative group/progress">
+        <div className="p-3 bg-transparent shrink-0 relative group/progress">
           {/* Detailed Progress Popover on Hover */}
-          <div className="absolute bottom-full left-3 right-3 mb-2 opacity-0 pointer-events-none group-hover/progress:opacity-100 group-hover/progress:pointer-events-auto transition-all duration-200 ease-out z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3.5 shadow-2xl space-y-3 animate-fadeIn">
+          <div className="absolute bottom-full left-3 right-3 mb-2 opacity-0 pointer-events-none group-hover/progress:opacity-100 group-hover/progress:pointer-events-auto transition-all duration-200 ease-out z-50 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-2xl p-3.5 shadow-xl space-y-3 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
               <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                 <TrendingUp className="w-3.5 h-3.5 text-brand-500" /> 项目进度与统计明细
@@ -342,7 +342,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50 shadow-sm cursor-pointer hover:border-brand-500/50 transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 border border-[#eeeeee] dark:border-slate-800 shadow-xs cursor-pointer hover:border-brand-500/40 transition-all">
             <div className="flex items-center justify-between text-xs mb-1.5 text-slate-700 dark:text-slate-300">
               <span className="flex items-center gap-1.5 font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> 总完成进度
@@ -351,7 +351,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {totalTasksCount === 0 ? 0 : Math.round((completedTasksCount / totalTasksCount) * 100)}%
               </span>
             </div>
-            <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-brand-500 to-emerald-400 transition-all duration-500"
                 style={{
@@ -368,39 +368,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Settings & Persistence Footer */}
-      <div className="p-2 border-t border-slate-200 dark:border-slate-800 space-y-1.5 shrink-0">
+      <div className="p-2.5 space-y-1.5 shrink-0">
 
         {isCollapsed ? (
           <div className="flex flex-col items-center space-y-1">
             <button
               onClick={onExportBackup}
               title="导出 JSON 备份"
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
+              className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-800 transition"
             >
               <Download className="w-4 h-4" />
             </button>
             <button
               onClick={onImportBackup}
               title="导入 JSON 恢复"
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
+              className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-[#eeeeee] dark:border-slate-800 transition"
             >
               <Upload className="w-4 h-4" />
             </button>
             <button
               onClick={onToggleTheme}
               title={theme === 'dark' ? '浅色模式' : '深色模式'}
-              className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
+              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
             </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-1.5 pt-1">
+            <div className="grid grid-cols-2 gap-1.5 pt-0.5">
               <button
                 onClick={onExportBackup}
                 title="导出 JSON 备份"
-                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700 transition"
+                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
               >
                 <Download className="w-3.5 h-3.5" /> 导出备份
               </button>
@@ -408,16 +408,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={onImportBackup}
                 title="导入 JSON 恢复"
-                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700 transition"
+                className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-[#eeeeee] dark:border-slate-800 transition shadow-2xs"
               >
                 <Upload className="w-3.5 h-3.5" /> 导入数据
               </button>
             </div>
 
-            <div className="pt-1">
+            <div className="pt-0.5">
               <button
                 onClick={onToggleTheme}
-                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
+                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition"
               >
                 <div className="flex items-center gap-2">
                   {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}

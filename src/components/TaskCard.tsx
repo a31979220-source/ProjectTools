@@ -19,8 +19,8 @@ const STATUS_STYLE_CONFIG: Record<string, {
     bg: 'bg-slate-500/10 dark:bg-slate-500/15',
     text: 'text-slate-600 dark:text-slate-300',
     border: 'border-slate-500/20',
-    cardBg: 'bg-white hover:bg-slate-50/60 dark:bg-slate-900/90 dark:hover:bg-slate-900',
-    cardBorder: 'border-slate-200/90 dark:border-slate-800/90 hover:border-slate-400/60 dark:hover:border-slate-700',
+    cardBg: 'bg-white hover:bg-slate-50/80 dark:bg-slate-900/90 dark:hover:bg-slate-900',
+    cardBorder: 'border-[#eeeeee] dark:border-slate-800/80 hover:border-brand-500/30 dark:hover:border-brand-500/30',
     cardIndicator: 'border-l-4 border-l-slate-400 dark:border-l-slate-500',
   },
   in_progress: {
@@ -28,8 +28,8 @@ const STATUS_STYLE_CONFIG: Record<string, {
     bg: 'bg-blue-500/10 dark:bg-blue-500/15',
     text: 'text-blue-600 dark:text-blue-400',
     border: 'border-blue-500/20',
-    cardBg: 'bg-blue-50/40 hover:bg-blue-50/70 dark:bg-blue-950/25 dark:hover:bg-blue-950/40',
-    cardBorder: 'border-blue-200/80 dark:border-blue-900/50 hover:border-blue-400/70 dark:hover:border-blue-500/60',
+    cardBg: 'bg-blue-50/30 hover:bg-blue-50/60 dark:bg-blue-950/20 dark:hover:bg-blue-950/35',
+    cardBorder: 'border-blue-100/70 dark:border-blue-900/40 hover:border-blue-300 dark:hover:border-blue-500/50',
     cardIndicator: 'border-l-4 border-l-blue-500 dark:border-l-blue-400',
   },
   review: {
@@ -37,8 +37,8 @@ const STATUS_STYLE_CONFIG: Record<string, {
     bg: 'bg-amber-500/10 dark:bg-amber-500/15',
     text: 'text-amber-600 dark:text-amber-400',
     border: 'border-amber-500/20',
-    cardBg: 'bg-amber-50/40 hover:bg-amber-50/70 dark:bg-amber-950/25 dark:hover:bg-amber-950/40',
-    cardBorder: 'border-amber-200/80 dark:border-amber-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/60',
+    cardBg: 'bg-amber-50/30 hover:bg-amber-50/60 dark:bg-amber-950/20 dark:hover:bg-amber-950/35',
+    cardBorder: 'border-amber-100/70 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-500/50',
     cardIndicator: 'border-l-4 border-l-amber-500 dark:border-l-amber-400',
   },
   done: {
@@ -46,8 +46,8 @@ const STATUS_STYLE_CONFIG: Record<string, {
     bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
     text: 'text-emerald-600 dark:text-emerald-400',
     border: 'border-emerald-500/20',
-    cardBg: 'bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/25 dark:hover:bg-emerald-950/40',
-    cardBorder: 'border-emerald-200/80 dark:border-emerald-900/50 hover:border-emerald-400/70 dark:hover:border-emerald-500/60',
+    cardBg: 'bg-emerald-50/30 hover:bg-emerald-50/60 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/35',
+    cardBorder: 'border-emerald-100/70 dark:border-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-500/50',
     cardIndicator: 'border-l-4 border-l-emerald-500 dark:border-l-emerald-400',
   },
 };
@@ -130,7 +130,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       <div
         draggable
         onDragStart={(e) => onDragStart(e, task.id)}
-        className={`group relative border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
+        className={`group relative border rounded-2xl p-3 shadow-2xs hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
       >
         {/* Header: Priority + Title + Actions */}
         <div className="flex items-start justify-between gap-2">
@@ -250,7 +250,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       <div
         draggable
         onDragStart={(e) => onDragStart(e, task.id)}
-        className={`group relative border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
+        className={`group relative border rounded-2xl p-3 shadow-2xs hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
       >
         <div className="flex items-center justify-between">
           <PrioritySelect
@@ -319,7 +319,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     <div
       draggable
       onDragStart={(e) => onDragStart(e, task.id)}
-      className={`group relative border rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
+      className={`group relative border rounded-2xl p-3.5 shadow-2xs hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
     >
       {/* Top Header: Priority Badge + Actions */}
       <div className="flex items-center justify-between mb-2">

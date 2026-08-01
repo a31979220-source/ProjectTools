@@ -191,7 +191,7 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
               left: `${coords.left}px`,
               zIndex: 99999,
             }}
-            className={`w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1 text-xs ${
+            className={`w-36 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-xl shadow-xl py-1 text-xs ${
               isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
             } overflow-hidden select-none`}
           >

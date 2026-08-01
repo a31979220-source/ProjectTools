@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Task, Column, Priority, SubTask, LocalFileItem } from '../types/project';
 import { PrioritySelect } from './PrioritySelect';
 import { CustomSelect } from './CustomSelect';
@@ -165,15 +166,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-backdrop-fade">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-backdrop-fade">
       <div
         ref={modalRef}
         style={{ transformOrigin }}
-        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-click-origin-pop"
+        className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-click-origin-pop"
       >
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <h3 className="font-bold text-base text-slate-800 dark:text-slate-100">
             {initialTask ? '编辑任务' : '新建任务'}
           </h3>
@@ -442,6 +443,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
