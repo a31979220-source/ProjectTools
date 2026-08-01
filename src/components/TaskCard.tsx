@@ -89,7 +89,7 @@ const renderTaskTitleWithStatusIcon = (title: string, columnId: string) => {
 
 interface TaskCardProps {
   task: Task;
-  onEdit: (task: Task) => void;
+  onEdit: (task: Task, e?: React.MouseEvent) => void;
   onDelete: (taskId: string) => void;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
@@ -108,15 +108,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   const completedSubtasks = task.subtasks.filter((st) => st.completed).length;
   const totalSubtasks = task.subtasks.length;
-  const statusStyle = STATUS_STYLE_CONFIG[task.columnId] || STATUS_STYLE_CONFIG.todo;
 
-  const handlePriorityChange = (newPriority: Priority) => {
+  const handlePriorityChange = (priority: Priority) => {
     if (onChangePriority) {
-      onChangePriority(task.id, newPriority);
-    } else {
-      onEdit({ ...task, priority: newPriority, updatedAt: new Date().toISOString() });
+      onChangePriority(task.id, priority);
     }
   };
+
+  const statusStyle = STATUS_STYLE_CONFIG[task.columnId] || STATUS_STYLE_CONFIG.todo;
 
   // Check if overdue
   const isOverdue = task.dueDate && new Date(task.dueDate).getTime() < new Date().setHours(0,0,0,0) && task.columnId !== 'done';
@@ -140,7 +139,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               className="shrink-0"
             />
             <h3
-              onClick={() => onEdit(task)}
+              onClick={(e) => onEdit(task, e)}
               className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-brand-500 cursor-pointer transition"
               title={task.title}
             >
@@ -148,22 +147,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             </h3>
           </div>
 
-          <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity shrink-0">
+          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1 transition-all duration-200 shrink-0">
             <button
-              onClick={() => onEdit(task)}
-              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200 transition"
+              onClick={(e) => onEdit(task, e)}
+              className="group/btn p-1.5 hover:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg text-slate-400 hover:text-brand-500 border border-transparent hover:border-brand-500/20 transition-all active:scale-90"
               title="编辑任务"
             >
-              <Edit3 className="w-3.5 h-3.5" />
+              <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
             </button>
             <button
               onClick={() => {
                 if (confirm(`确定删除任务 "${task.title}" 吗？`)) onDelete(task.id);
               }}
-              className="p-1 hover:bg-rose-500/10 rounded text-slate-400 hover:text-rose-500 transition"
+              className="group/btn p-1.5 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-500/20 transition-all active:scale-90"
               title="删除任务"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:-rotate-12 group-hover/btn:scale-110" />
             </button>
           </div>
         </div>
@@ -247,22 +246,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             onChange={handlePriorityChange}
             size="xs"
           />
-          <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1 transition-all duration-200">
             <button
-              onClick={() => onEdit(task)}
-              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200 transition"
+              onClick={(e) => onEdit(task, e)}
+              className="group/btn p-1.5 hover:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg text-slate-400 hover:text-brand-500 border border-transparent hover:border-brand-500/20 transition-all active:scale-90"
               title="编辑任务"
             >
-              <Edit3 className="w-3 h-3" />
+              <Edit3 className="w-3 h-3 transition-transform duration-200 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
             </button>
             <button
               onClick={() => {
                 if (confirm(`确定删除任务 "${task.title}" 吗？`)) onDelete(task.id);
               }}
-              className="p-1 hover:bg-rose-500/10 rounded text-slate-400 hover:text-rose-500 transition"
+              className="group/btn p-1.5 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-500/20 transition-all active:scale-90"
               title="删除任务"
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-3 h-3 transition-transform duration-200 group-hover/btn:-rotate-12 group-hover/btn:scale-110" />
             </button>
           </div>
         </div>

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Project, Priority, FilterState } from '../types/project';
 import { Search, Plus, Tag, Flag, FolderOpen, ExternalLink } from 'lucide-react';
+import { CustomSelect } from './CustomSelect';
 
 interface HeaderProps {
   activeProject: Project | undefined;
   filterState: FilterState;
   onUpdateFilter: (filter: Partial<FilterState>) => void;
   availableTags: string[];
-  onOpenNewTaskModal: () => void;
+  onOpenNewTaskModal: (e?: React.MouseEvent) => void;
   onEditProjectModal: () => void;
 }
 
@@ -90,56 +91,48 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Priority Filter */}
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-          <Flag className="w-3.5 h-3.5 text-slate-400 ml-1.5" />
-          <select
-            value={filterState.priority}
-            onChange={(e) => onUpdateFilter({ priority: e.target.value as Priority | 'all' })}
-            className="bg-transparent text-xs text-slate-700 dark:text-slate-300 focus:outline-none pr-1 cursor-pointer font-medium"
-          >
-            <option value="all">所有优先级</option>
-            <option value="urgent">🔴 紧急</option>
-            <option value="high">🟠 高</option>
-            <option value="medium">🟡 中</option>
-            <option value="low">🔵 低</option>
-          </select>
-        </div>
+        <CustomSelect
+          value={filterState.priority}
+          onChange={(val) => onUpdateFilter({ priority: val as Priority | 'all' })}
+          icon={<Flag className="w-3.5 h-3.5 text-slate-400" />}
+          options={[
+            { value: 'all', label: '所有优先级' },
+            { value: 'urgent', label: '🔴 紧急' },
+            { value: 'high', label: '🟠 高' },
+            { value: 'medium', label: '🟡 中' },
+            { value: 'low', label: '🔵 低' },
+          ]}
+        />
 
         {/* Tag Filter */}
         {availableTags.length > 0 && (
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-            <Tag className="w-3.5 h-3.5 text-slate-400 ml-1.5" />
-            <select
-              value={filterState.tag}
-              onChange={(e) => onUpdateFilter({ tag: e.target.value })}
-              className="bg-transparent text-xs text-slate-700 dark:text-slate-300 focus:outline-none pr-1 cursor-pointer font-medium"
-            >
-              <option value="all">所有标签</option>
-              {availableTags.map((tag) => (
-                <option key={tag} value={tag}>
-                  #{tag}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            value={filterState.tag}
+            onChange={(val) => onUpdateFilter({ tag: val })}
+            icon={<Tag className="w-3.5 h-3.5 text-slate-400" />}
+            options={[
+              { value: 'all', label: '所有标签' },
+              ...availableTags.map((t) => ({ value: t, label: `#${t}` })),
+            ]}
+          />
         )}
 
         {/* Reset Filter Button if active */}
         {(filterState.searchQuery || filterState.priority !== 'all' || filterState.tag !== 'all') && (
           <button
             onClick={() => onUpdateFilter({ searchQuery: '', priority: 'all', tag: 'all' })}
-            className="text-xs text-slate-500 hover:text-brand-500 transition px-2 py-1"
+            className="text-xs text-slate-500 hover:text-brand-500 transition px-2 py-1 hover:underline"
           >
             重置筛选
           </button>
         )}
 
-        {/* Add Task Button */}
+        {/* Add Task Main Button */}
         <button
-          onClick={onOpenNewTaskModal}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-md shadow-brand-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          onClick={(e) => onOpenNewTaskModal(e)}
+          className="group flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-brand-500 to-indigo-500 hover:from-brand-600 hover:to-indigo-600 text-white rounded-lg text-xs font-semibold shadow-md shadow-brand-500/25 hover:shadow-lg hover:shadow-brand-500/35 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
           <span>新建任务</span>
         </button>
       </div>

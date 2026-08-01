@@ -68,6 +68,7 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
   className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number; positionUpwards: boolean }>({
     top: 0,
     left: 0,
@@ -77,12 +78,26 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
   const buttonRef = useRef<HTMLDivElement>(null);
   const activeConfig = PRIORITY_OPTIONS[value] || PRIORITY_OPTIONS.medium;
 
+  const closeMenu = () => {
+    if (isClosing || !isOpen) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+    }, 170);
+  };
+
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (disabled) return;
 
-    if (!isOpen && buttonRef.current) {
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
+
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const positionUpwards = spaceBelow < 180;
@@ -93,20 +108,21 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
         positionUpwards,
       });
     }
-    setIsOpen(!isOpen);
+    setIsOpen(true);
+    setIsClosing(false);
   };
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleScrollOrResize = () => setIsOpen(false);
+    const handleScrollOrResize = () => closeMenu();
     const handleClickOutside = (e: MouseEvent) => {
       if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
         const portalMenu = document.getElementById('priority-select-portal-menu');
         if (portalMenu && portalMenu.contains(e.target as Node)) {
           return;
         }
-        setIsOpen(false);
+        closeMenu();
       }
     };
 
@@ -119,12 +135,12 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
       window.removeEventListener('scroll', handleScrollOrResize, true);
       window.removeEventListener('resize', handleScrollOrResize);
     };
-  }, [isOpen]);
+  }, [isOpen, isClosing]);
 
   const handleSelectPriority = (e: React.MouseEvent, key: Priority) => {
     e.stopPropagation();
     e.preventDefault();
-    setIsOpen(false);
+    closeMenu();
     if (key !== value) {
       onChange(key);
     }
@@ -175,7 +191,9 @@ export const PrioritySelect: React.FC<PrioritySelectProps> = ({
               left: `${coords.left}px`,
               zIndex: 99999,
             }}
-            className="w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 text-xs animate-fadeIn overflow-hidden select-none"
+            className={`w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1 text-xs ${
+              isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
+            } overflow-hidden select-none`}
           >
             <div className="px-2.5 py-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 mb-0.5">
               选择优先级

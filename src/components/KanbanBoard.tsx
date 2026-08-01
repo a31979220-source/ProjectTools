@@ -26,11 +26,11 @@ interface KanbanBoardProps {
   isLoadingFiles: boolean;
   onRefreshFiles: () => void;
   onMoveTask: (taskId: string, targetColumnId: string) => void;
-  onEditTask: (task: Task) => void;
+  onEditTask: (task: Task, e?: React.MouseEvent) => void;
   onDeleteTask: (taskId: string) => void;
   onChangeTaskPriority?: (taskId: string, priority: Priority) => void;
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
-  onOpenNewTaskModalForColumn: (columnId: string) => void;
+  onOpenNewTaskModalForColumn: (columnId: string, e?: React.MouseEvent) => void;
   onOpenEditProjectModal: () => void;
   onImportFileAsTask: (file: LocalFileItem, targetColumnId?: string) => void;
   onReorderColumns?: (columns: Column[]) => void;
@@ -554,12 +554,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onOpenNewTaskModalForColumn(col.id);
+                        onOpenNewTaskModalForColumn(col.id, e);
                       }}
-                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition shrink-0"
+                      className="group/add p-1.5 hover:bg-brand-500/15 dark:hover:bg-brand-500/20 text-slate-500 hover:text-brand-500 dark:text-slate-400 dark:hover:text-brand-400 rounded-lg transition-all duration-200 active:scale-90 hover:scale-105 shrink-0 border border-transparent hover:border-brand-500/20"
                       title="在该状态下添加任务"
                     >
-                      <Plus className="w-3.5 h-3.5" />
+                      <Plus className="w-3.5 h-3.5 transition-transform duration-300 group-hover/add:rotate-90" />
                     </button>
                   </div>
                 </div>

@@ -31,6 +31,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
   size = 'md',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [menuCoords, setMenuCoords] = useState<{ top: number; left: number; positionUpwards: boolean }>({
     top: 0,
     left: 0,
@@ -60,7 +61,6 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
     loadApps();
   }, []);
 
-  // Save custom apps permanently to Electron UserData disk file
   const saveCustomApps = async (newApps: CustomOpenApp[]) => {
     setCustomApps(newApps);
     if (window.electronAPI?.saveCustomApps) {
@@ -77,9 +77,24 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
     await saveCustomApps(updated);
   };
 
+  const closeMenu = () => {
+    if (isClosing || !isOpen) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+    }, 170);
+  };
+
   const handleToggleMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isOpen && buttonRef.current) {
+
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
+
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       const spaceBelow = windowHeight - rect.bottom;
@@ -91,20 +106,21 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
         positionUpwards,
       });
     }
-    setIsOpen(!isOpen);
+    setIsOpen(true);
+    setIsClosing(false);
   };
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleScrollOrResize = () => setIsOpen(false);
+    const handleScrollOrResize = () => closeMenu();
     const handleClickOutside = (e: MouseEvent) => {
       if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
         const portalMenu = document.getElementById('open-with-portal-menu');
         if (portalMenu && portalMenu.contains(e.target as Node)) {
           return;
         }
-        setIsOpen(false);
+        closeMenu();
       }
     };
 
@@ -117,7 +133,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
       window.removeEventListener('scroll', handleScrollOrResize, true);
       window.removeEventListener('resize', handleScrollOrResize);
     };
-  }, [isOpen]);
+  }, [isOpen, isClosing]);
 
   const ext = extension.toLowerCase();
   const itemType = isDirectory ? 'folder' : (ext || 'general');
@@ -128,7 +144,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
   );
 
   const handleOpen = async (appName: string, customExePath?: string) => {
-    setIsOpen(false);
+    closeMenu();
     if (window.electronAPI?.openWith) {
       const res = await window.electronAPI.openWith(itemPath, appName, customExePath);
       if (res && res.success && res.exePath && res.exeName) {
@@ -144,7 +160,7 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
             iconDataUrl: res.iconDataUrl,
             forType: itemType,
           };
-          await saveCustomApps([...customApps, newApp]);
+          setCustomApps([...customApps, newApp]);
         }
       }
     } else if (window.electronAPI?.openFolder && isDirectory) {
@@ -201,7 +217,9 @@ export const OpenWithMenu: React.FC<OpenWithMenuProps> = ({
             left: `${menuCoords.left}px`,
             zIndex: 99999,
           }}
-          className="w-54 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1 text-xs animate-fadeIn overflow-hidden select-none"
+          className={`w-54 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1 text-xs ${
+            isClosing ? 'animate-dropdown-collapse' : 'animate-dropdown-expand'
+          } overflow-hidden select-none`}
         >
           <div className="px-3 py-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
             <span>选择打开方式</span>

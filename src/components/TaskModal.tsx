@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Task, Column, Priority, SubTask, LocalFileItem } from '../types/project';
 import { PrioritySelect } from './PrioritySelect';
+import { CustomSelect } from './CustomSelect';
 import { X, Plus, Trash2, Tag as TagIcon, Calendar, CheckSquare, Flag, Folder } from 'lucide-react';
 
 interface TaskModalProps {
@@ -13,6 +14,7 @@ interface TaskModalProps {
   projectId: string;
   localFiles?: LocalFileItem[];
   localFolderPath?: string;
+  triggerPosition?: { x: number; y: number } | null;
 }
 
 export const TaskModal: React.FC<TaskModalProps> = ({
@@ -25,7 +27,29 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   projectId,
   localFiles = [],
   localFolderPath,
+  triggerPosition,
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [transformOrigin, setTransformOrigin] = useState<string>('center center');
+
+  useEffect(() => {
+    if (isOpen && triggerPosition) {
+      if (modalRef.current) {
+        const rect = modalRef.current.getBoundingClientRect();
+        const rx = triggerPosition.x - rect.left;
+        const ry = triggerPosition.y - rect.top;
+        setTransformOrigin(`${rx}px ${ry}px`);
+      } else {
+        const w = Math.min(window.innerWidth - 32, 576);
+        const h = Math.min(window.innerHeight * 0.85, 600);
+        const left = (window.innerWidth - w) / 2;
+        const top = (window.innerHeight - h) / 2;
+        setTransformOrigin(`${triggerPosition.x - left}px ${triggerPosition.y - top}px`);
+      }
+    } else {
+      setTransformOrigin('top center');
+    }
+  }, [isOpen, triggerPosition]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [columnId, setColumnId] = useState(defaultColumnId);
@@ -133,8 +157,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-backdrop-fade">
+      <div
+        ref={modalRef}
+        style={{ transformOrigin }}
+        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-click-origin-pop"
+      >
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <h3 className="font-bold text-base text-slate-800 dark:text-slate-100">
@@ -185,35 +213,29 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               <Folder className="w-3.5 h-3.5 text-brand-500" /> 关联项目下的文件 / 目录
             </label>
 
-            <select
+            <CustomSelect
               value={associatedPath}
-              onChange={(e) => {
-                const val = e.target.value;
+              onChange={(val) => {
                 if (val === '__custom__') {
                   handleSelectCustomFolder();
                 } else {
                   setAssociatedPath(val);
                 }
               }}
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50 font-mono"
-            >
-              <option value="">-- 不关联文件/目录 --</option>
-              {localFolderPath && (
-                <option value={localFolderPath}>
-                  📁 [关联项目主目录] {localFolderPath}
-                </option>
-              )}
-              {localFiles && localFiles.length > 0 && (
-                <optgroup label={`当前项目扫描到的文件 (${localFiles.length} 项)`}>
-                  {localFiles.map((f) => (
-                    <option key={f.path} value={f.path}>
-                      {f.isDirectory ? '📁 目录: ' : '📄 文件: '}{f.name}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-              <option value="__custom__">📂 浏览选择其它系统文件夹...</option>
-            </select>
+              placeholder="-- 不关联文件/目录 --"
+              className="w-full font-mono py-2"
+              options={[
+                { value: '', label: '-- 不关联文件/目录 --' },
+                ...(localFolderPath
+                  ? [{ value: localFolderPath, label: `📁 [关联项目主目录] ${localFolderPath}` }]
+                  : []),
+                ...localFiles.map((f) => ({
+                  value: f.path,
+                  label: `${f.isDirectory ? '📁 目录: ' : '📄 文件: '}${f.name}`,
+                })),
+                { value: '__custom__', label: '📂 浏览选择其它系统文件夹...' },
+              ]}
+            />
 
             {associatedPath && (
               <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300 font-mono bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 gap-2">
@@ -237,17 +259,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 当前状态
               </label>
-              <select
+              <CustomSelect
                 value={columnId}
-                onChange={(e) => setColumnId(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
-              >
-                {columns.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setColumnId(val)}
+                className="w-full py-2"
+                options={columns.map((c) => ({
+                  value: c.id,
+                  label: c.title,
+                }))}
+              />
             </div>
 
             <div>

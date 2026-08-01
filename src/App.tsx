@@ -15,17 +15,8 @@ export function App() {
   const [columns, setColumns] = useState<Column[]>(() => StorageService.getColumns());
   const [activeProjectId, setActiveProjectId] = useState<string>('');
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
-  const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
-
   const handleSelectViewMode = useCallback((newMode: ViewMode) => {
-    setViewMode((prevMode) => {
-      if (prevMode === newMode) return prevMode;
-      const viewOrder: Record<ViewMode, number> = { kanban: 0, gantt: 1, stats: 2 };
-      const prevOrder = viewOrder[prevMode] ?? 0;
-      const nextOrder = viewOrder[newMode] ?? 0;
-      setSlideDirection(nextOrder >= prevOrder ? 'forward' : 'backward');
-      return newMode;
-    });
+    setViewMode(newMode);
   }, []);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -50,6 +41,28 @@ export function App() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultTaskColumnId, setDefaultTaskColumnId] = useState('todo');
+  const [taskModalTriggerPos, setTaskModalTriggerPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleOpenTaskModal = (e?: React.MouseEvent, columnId: string = 'todo') => {
+    if (e) {
+      setTaskModalTriggerPos({ x: e.clientX, y: e.clientY });
+    } else {
+      setTaskModalTriggerPos(null);
+    }
+    setEditingTask(null);
+    setDefaultTaskColumnId(columnId);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleEditTaskModal = (task: Task, e?: React.MouseEvent) => {
+    if (e) {
+      setTaskModalTriggerPos({ x: e.clientX, y: e.clientY });
+    } else {
+      setTaskModalTriggerPos(null);
+    }
+    setEditingTask(task);
+    setIsTaskModalOpen(true);
+  };
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -431,11 +444,7 @@ export function App() {
           filterState={filterState}
           onUpdateFilter={(update) => setFilterState((prev) => ({ ...prev, ...update }))}
           availableTags={availableTags}
-          onOpenNewTaskModal={() => {
-            setEditingTask(null);
-            setDefaultTaskColumnId('todo');
-            setIsTaskModalOpen(true);
-          }}
+          onOpenNewTaskModal={(e) => handleOpenTaskModal(e)}
           onEditProjectModal={() => {
             if (activeProject) {
               setEditingProject(activeProject);
@@ -447,9 +456,8 @@ export function App() {
         {/* Dynamic View Router */}
         <main className="flex-1 overflow-hidden relative">
           <div
-            key={viewMode}
-            className={`w-full h-full ${slideDirection === 'forward' ? 'animate-view-slide-forward' : 'animate-view-slide-backward'
-              }`}
+            key={`${activeProjectId}-${viewMode}`}
+            className="w-full h-full animate-view-slide-up"
           >
             {viewMode === 'kanban' && (
               <KanbanBoard
@@ -460,18 +468,11 @@ export function App() {
                 isLoadingFiles={isLoadingFiles}
                 onRefreshFiles={fetchLocalFolderFiles}
                 onMoveTask={handleMoveTask}
-                onEditTask={(task) => {
-                  setEditingTask(task);
-                  setIsTaskModalOpen(true);
-                }}
+                onEditTask={(task, e) => handleEditTaskModal(task, e)}
                 onDeleteTask={handleDeleteTask}
                 onChangeTaskPriority={handleChangeTaskPriority}
                 onToggleSubtask={handleToggleSubtask}
-                onOpenNewTaskModalForColumn={(colId) => {
-                  setEditingTask(null);
-                  setDefaultTaskColumnId(colId);
-                  setIsTaskModalOpen(true);
-                }}
+                onOpenNewTaskModalForColumn={(colId, e) => handleOpenTaskModal(e, colId)}
                 onOpenEditProjectModal={() => {
                   if (activeProject) {
                     setEditingProject(activeProject);
@@ -487,10 +488,7 @@ export function App() {
               <GanttView
                 tasks={filteredTasks}
                 columns={columns}
-                onEditTask={(task) => {
-                  setEditingTask(task);
-                  setIsTaskModalOpen(true);
-                }}
+                onEditTask={(task) => handleEditTaskModal(task)}
               />
             )}
 
@@ -512,6 +510,7 @@ export function App() {
         projectId={activeProjectId}
         localFiles={localFiles}
         localFolderPath={activeProject?.localFolderPath}
+        triggerPosition={taskModalTriggerPos}
       />
 
       {/* Project Modal */}

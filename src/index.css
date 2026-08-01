@@ -58,41 +58,126 @@
   border: 1px solid rgba(30, 41, 59, 0.8);
 }
 
-/* Enhanced View Switch Animations & Transitions */
-@keyframes viewSlideForward {
+/* Premium Smooth Vertical Slide-Up View Transition */
+@keyframes viewSlideUpIn {
   0% {
     opacity: 0;
-    transform: translate3d(24px, 0, 0) scale(0.985);
-    filter: blur(2px);
+    transform: translate3d(0, 36px, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes viewSlideBackward {
+.animate-view-slide-up {
+  animation: viewSlideUpIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Modal Pop & Backdrop Animations */
+@keyframes backdropFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes modalPopIn {
   0% {
     opacity: 0;
-    transform: translate3d(-24px, 0, 0) scale(0.985);
-    filter: blur(2px);
+    transform: scale(0.93) translate3d(0, 14px, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: scale(1) translate3d(0, 0, 0);
   }
 }
 
-.animate-view-slide-forward {
-  animation: viewSlideForward 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity, filter;
+.animate-backdrop-fade {
+  animation: backdropFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-view-slide-backward {
-  animation: viewSlideBackward 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity, filter;
+.animate-modal-pop {
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1.25, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes modalPopFromButton {
+  0% {
+    opacity: 0;
+    transform: scale(0.35) translate3d(0, -32px, 0);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) translate3d(0, 2px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.animate-modal-pop-from-button {
+  animation: modalPopFromButton 0.32s cubic-bezier(0.16, 1.25, 0.3, 1) forwards;
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+/* Dynamic Click Origin Pop Animation */
+@keyframes clickOriginPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-click-origin-pop {
+  animation: clickOriginPop 0.45s cubic-bezier(0.16, 1.12, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Premium Dropdown Menu Smooth Pop & Slide Animations */
+@keyframes dropdownExpandDown {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.65) translate3d(0, -10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes dropdownCollapseUp {
+  0% {
+    opacity: 1;
+    transform: scaleY(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.65) translate3d(0, -10px, 0);
+  }
+}
+
+.animate-dropdown-expand {
+  animation: dropdownExpandDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top left;
+  will-change: transform, opacity;
+}
+
+.animate-dropdown-collapse {
+  animation: dropdownCollapseUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top left;
+  will-change: transform, opacity;
 }
 
 
