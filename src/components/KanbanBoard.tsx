@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Task, Column, LocalFileItem, Priority } from '../types/project';
 import { TaskCard } from './TaskCard';
 import { OpenWithMenu } from './OpenWithMenu';
@@ -56,6 +56,27 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onReorderColumns,
 }) => {
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+
+  const handleColumnWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const isScrollable = el.scrollHeight > el.clientHeight + 2;
+
+    if (isScrollable) {
+      const isAtTop = el.scrollTop <= 0 && e.deltaY < 0;
+      const isAtBottom = Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 2 && e.deltaY > 0;
+
+      // When the column has scroll overflow and is inside bounds, allow individual column scrolling!
+      if (!isAtTop && !isAtBottom) {
+        return;
+      }
+    }
+
+    // Scroll outer page when column reaches boundary or has no overflow
+    if (boardRef.current) {
+      boardRef.current.scrollTop += e.deltaY;
+    }
+  };
 
   // Global folder scanner view mode
   const [folderViewMode, setFolderViewMode] = useState<FolderViewMode>(() => {
@@ -198,7 +219,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-950 select-none">
+    <div
+      ref={boardRef}
+      className="h-full flex flex-col overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-950 select-none space-y-6 scroll-smooth"
+    >
 
       {/* Local Folder Workspace Scanning Area (Win11 File Explorer UI) */}
       <div className="mb-6 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-5 shadow-xs shrink-0">
@@ -474,7 +498,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       </div>
 
       {/* Main Kanban Content Area: Vertical Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-0 p-1.5 overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[580px] p-1.5 shrink-0 pb-8">
         {columns.map((col) => {
             const columnTasks = tasks
               .filter((t) => t.columnId === col.id)
@@ -491,7 +515,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onDragOver={(e) => handleDragOver(e, col.id)}
                 onDragLeave={(e) => handleDragLeave(e, col.id)}
                 onDrop={(e) => handleDrop(e, col.id)}
-                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-white/70 dark:bg-slate-900/50 border transition-all duration-200 shadow-xs ${
+                className={`h-[560px] min-w-0 flex flex-col rounded-2xl bg-white/70 dark:bg-slate-900/50 border transition-all duration-200 shadow-xs ${
                   isOver
                     ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
                     : 'border-[#eeeeee] dark:border-slate-800/70'
@@ -565,7 +589,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 </div>
 
                 {/* Column Scrollable Task List Container */}
-                <div className="flex-1 min-h-[220px] overflow-y-auto p-3 space-y-3 custom-scrollbar">
+                <div
+                  onWheel={handleColumnWheel}
+                  className="flex-1 min-h-[300px] overflow-y-auto p-3 space-y-3 custom-scrollbar"
+                >
                   {columnTasks.length === 0 ? (
                     <div className="h-36 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 text-xs p-3 text-center">
                       <Layers className="w-6 h-6 mb-1.5 opacity-40" />

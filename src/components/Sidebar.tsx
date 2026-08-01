@@ -40,6 +40,8 @@ interface SidebarProps {
   completedTasksCount: number;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  sidebarWidth?: number;
+  onSidebarWidthChange?: (width: number) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -60,8 +62,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
   completedTasksCount,
   isCollapsed,
   onToggleCollapse,
+  sidebarWidth = 256,
+  onSidebarWidthChange,
 }) => {
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const currentWidth = isCollapsed ? 64 : sidebarWidth;
+
+  const handleMouseDownResize = (e: React.MouseEvent) => {
+    if (isCollapsed) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = Math.max(180, Math.min(480, moveEvent.clientX));
+      if (onSidebarWidthChange) {
+        onSidebarWidthChange(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
   // Statistics for Hover Detailed Information Popover
   const todoCount = activeProjectTasks.filter((t) => t.columnId === 'todo').length;
   const inProgressCount = activeProjectTasks.filter((t) => t.columnId === 'in_progress').length;
@@ -88,9 +121,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`${
-        isCollapsed ? 'w-16' : 'w-64'
-      } bg-slate-50/70 dark:bg-slate-950/70 flex flex-col transition-all duration-300 relative z-30 select-none`}
+      style={{ width: currentWidth }}
+      className={`bg-slate-50/70 dark:bg-slate-950/70 flex flex-col ${
+        isResizing ? 'transition-none select-none' : 'transition-all duration-200'
+      } relative z-30 select-none shrink-0 group/sidebar`}
     >
       {/* Brand Header */}
       <div className="p-4 flex items-center justify-between shrink-0">
@@ -428,6 +462,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         )}
       </div>
+
+      {/* Stepless Drag Resizer Handle */}
+      {!isCollapsed && (
+        <div
+          onMouseDown={handleMouseDownResize}
+          title="按住鼠标拖拽无极调节侧边栏宽度"
+          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group/resizer hover:bg-brand-500/40 active:bg-brand-500 transition-colors flex items-center justify-center"
+        >
+          <div className="w-0.5 h-8 bg-slate-300 dark:bg-slate-700 group-hover/resizer:bg-brand-500 rounded-full transition-colors opacity-0 group-hover/sidebar:opacity-100" />
+        </div>
+      )}
 
       {/* Delete Project Confirm Modal */}
       <ConfirmModal

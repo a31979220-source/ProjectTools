@@ -29,8 +29,9 @@ export function App() {
   const [localFiles, setLocalFiles] = useState<LocalFileItem[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
-  // Sidebar Collapse State
+  // Sidebar Collapse & Width State
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(256);
 
   // Modal States
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -82,6 +83,11 @@ export function App() {
     const savedTheme = (localStorage.getItem('app_theme') as 'light' | 'dark') || 'light';
     const savedViewMode = (localStorage.getItem('app_view_mode') as 'kanban' | 'gantt' | 'stats') || 'kanban';
     const savedSidebarCollapsed = localStorage.getItem('app_sidebar_collapsed') === 'true';
+
+    const savedSidebarWidth = parseInt(localStorage.getItem('app_sidebar_width') || '256', 10);
+    if (!isNaN(savedSidebarWidth) && savedSidebarWidth >= 180 && savedSidebarWidth <= 480) {
+      setSidebarWidth(savedSidebarWidth);
+    }
 
     setProjects(loadedProjects);
     setTasks(loadedTasks);
@@ -169,6 +175,11 @@ export function App() {
     const nextState = !isSidebarCollapsed;
     setIsSidebarCollapsed(nextState);
     localStorage.setItem('app_sidebar_collapsed', String(nextState));
+  };
+
+  const handleSidebarWidthChange = (newWidth: number) => {
+    setSidebarWidth(newWidth);
+    localStorage.setItem('app_sidebar_width', String(newWidth));
   };
 
   // Filter Tasks by Active Project and Filter Controls
@@ -452,6 +463,8 @@ export function App() {
         completedTasksCount={activeProjectTasks.filter((t) => t.columnId === 'done').length}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={handleToggleSidebarCollapse}
+        sidebarWidth={sidebarWidth}
+        onSidebarWidthChange={handleSidebarWidthChange}
       />
 
       {/* Main Content Area */}
