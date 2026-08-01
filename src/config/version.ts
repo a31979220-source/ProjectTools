@@ -14,20 +14,19 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.1.0',
+  version: '1.1.1',
   releaseDate: '2026-08-02',
-  buildNumber: '20260802.v1100',
+  buildNumber: '20260802.v1101',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe',
-  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe',
+  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.1/ProjectTools-Setup-1.1.1.exe',
+  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.1/ProjectTools-Setup-1.1.1.exe',
   features: [
+    '支持大图标、详细信息、平铺列表 视图切换时的左右优雅平滑双向滑动动画',
+    '缩小工作区与看板视图之间多余的垂直间距空隙',
     '优化远程版本检查逻辑，优先查询 GitHub/Gitee Release API 接口',
-    '修复旧缓存节点导致不提示新版本更新的问题',
-    '视图切换按钮优化为下拉框形式，提升操作效率',
-    '全面 UI 黑白极简化改造，去除所有非必要彩色装饰',
     '全局交互细节与视觉体验提升',
   ],
 };

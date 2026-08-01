@@ -17,7 +17,8 @@ import {
   GripVertical,
   List,
   Grid2X2,
-  ChevronDown
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 interface KanbanBoardProps {
@@ -39,6 +40,12 @@ interface KanbanBoardProps {
 }
 
 type FolderViewMode = 'grid' | 'details' | 'tiles';
+
+const VIEW_MODE_INDEX: Record<FolderViewMode, number> = {
+  grid: 0,
+  details: 1,
+  tiles: 2,
+};
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   columns,
@@ -85,6 +92,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [folderViewMode, setFolderViewMode] = useState<FolderViewMode>(() => {
     return (localStorage.getItem('pt_folder_view_mode_v1') as FolderViewMode) || 'grid';
   });
+  const [folderSlideDir, setFolderSlideDir] = useState<'left' | 'right'>('left');
 
   // Per-column task card display modes state
   const [columnViewModes, setColumnViewModes] = useState<Record<string, FolderViewMode>>(() => {
@@ -97,22 +105,31 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       return { todo: 'grid', in_progress: 'grid', review: 'grid', done: 'grid' };
     }
   });
+  const [columnSlideDirs, setColumnSlideDirs] = useState<Record<string, 'left' | 'right'>>({});
 
   const handleSetColumnViewMode = (colId: string, mode: FolderViewMode) => {
+    const currentMode = columnViewModes[colId] || 'grid';
+    const dir = VIEW_MODE_INDEX[mode] >= VIEW_MODE_INDEX[currentMode] ? 'left' : 'right';
+    setColumnSlideDirs((prev) => ({ ...prev, [colId]: dir }));
     const updated = { ...columnViewModes, [colId]: mode };
     setColumnViewModes(updated);
     localStorage.setItem('pt_column_view_modes_v2', JSON.stringify(updated));
   };
 
   const handleSetAllColumnsViewMode = (mode: FolderViewMode) => {
+    const dir = VIEW_MODE_INDEX[mode] >= VIEW_MODE_INDEX[folderViewMode] ? 'left' : 'right';
+    setFolderSlideDir(dir);
     setFolderViewMode(mode);
     localStorage.setItem('pt_folder_view_mode_v1', mode);
-    const updated: Record<string, FolderViewMode> = {};
+    const updatedModes: Record<string, FolderViewMode> = {};
+    const updatedDirs: Record<string, 'left' | 'right'> = {};
     columns.forEach((c) => {
-      updated[c.id] = mode;
+      updatedModes[c.id] = mode;
+      updatedDirs[c.id] = dir;
     });
-    setColumnViewModes(updated);
-    localStorage.setItem('pt_column_view_modes_v2', JSON.stringify(updated));
+    setColumnSlideDirs(updatedDirs);
+    setColumnViewModes(updatedModes);
+    localStorage.setItem('pt_column_view_modes_v2', JSON.stringify(updatedModes));
   };
 
   const handleTaskDragStart = (e: React.DragEvent, taskId: string) => {
@@ -224,11 +241,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <div
       ref={boardRef}
-      className="h-full flex flex-col overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-950 select-none space-y-6 scroll-smooth"
+      className="h-full flex flex-col overflow-y-auto custom-scrollbar p-5 bg-slate-50 dark:bg-slate-950 select-none space-y-3.5 scroll-smooth"
     >
 
       {/* Local Folder Workspace Scanning Area (Win11 File Explorer UI) */}
-      <div className="mb-6 bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-5 shadow-xs shrink-0">
+      <div className="bg-white dark:bg-slate-900 border border-[#eeeeee] dark:border-slate-800/70 rounded-2xl p-4 shadow-xs shrink-0">
         {localFolderPath ? (
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
@@ -254,41 +271,50 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     <span>{folderViewMode === 'grid' ? '大图标' : folderViewMode === 'details' ? '详细信息' : '平铺列表'}</span>
                     <ChevronDown className="w-3 h-3 text-slate-400 group-hover/dropdown:text-slate-600 dark:group-hover/dropdown:text-slate-300 transition" />
                   </button>
-                  <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-200 z-50 py-1">
-                    <button
-                      onClick={() => handleSetAllColumnsViewMode('grid')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
-                        folderViewMode === 'grid'
-                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <LayoutGrid className="w-3.5 h-3.5" />
-                      <span>大图标</span>
-                    </button>
-                    <button
-                      onClick={() => handleSetAllColumnsViewMode('details')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
-                        folderViewMode === 'details'
-                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <List className="w-3.5 h-3.5" />
-                      <span>详细信息</span>
-                    </button>
-                    <button
-                      onClick={() => handleSetAllColumnsViewMode('tiles')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
-                        folderViewMode === 'tiles'
-                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Grid2X2 className="w-3.5 h-3.5" />
-                      <span>平铺列表</span>
-                    </button>
-                  </div>
+                    <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-200 z-50 py-1 overflow-hidden">
+                      <button
+                        onClick={() => handleSetAllColumnsViewMode('grid')}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
+                          folderViewMode === 'grid'
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                          <span>大图标</span>
+                        </div>
+                        {folderViewMode === 'grid' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
+                      </button>
+                      <button
+                        onClick={() => handleSetAllColumnsViewMode('details')}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
+                          folderViewMode === 'details'
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <List className="w-3.5 h-3.5" />
+                          <span>详细信息</span>
+                        </div>
+                        {folderViewMode === 'details' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
+                      </button>
+                      <button
+                        onClick={() => handleSetAllColumnsViewMode('tiles')}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
+                          folderViewMode === 'tiles'
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Grid2X2 className="w-3.5 h-3.5" />
+                          <span>平铺列表</span>
+                        </div>
+                        {folderViewMode === 'tiles' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
+                      </button>
+                    </div>
                 </div>
 
                 {localFiles.length > 0 && (
@@ -320,7 +346,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <span>文件夹为空或无法读取文件。</span>
               </div>
             ) : (
-              <div key={folderViewMode} className="animate-view-switch">
+              <div
+                key={`${folderViewMode}-${folderSlideDir}`}
+                className={folderSlideDir === 'left' ? 'animate-view-slide-left' : 'animate-view-slide-right'}
+              >
                 {folderViewMode === 'grid' ? (
                   /* GRID VIEW MODE */
                   <div className="flex gap-3 overflow-x-auto pb-2 pt-1 px-1 custom-scrollbar">
@@ -545,39 +574,48 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         {colViewMode === 'tiles' && <Grid2X2 className="w-3 h-3" />}
                         <ChevronDown className="w-2.5 h-2.5" />
                       </button>
-                      <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/col-dropdown:opacity-100 group-hover/col-dropdown:visible transition-all duration-200 z-50 py-1">
+                      <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg opacity-0 invisible group-hover/col-dropdown:opacity-100 group-hover/col-dropdown:visible transition-all duration-200 z-50 py-1 overflow-hidden">
                         <button
                           onClick={() => handleSetColumnViewMode(col.id, 'grid')}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                          className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
                             colViewMode === 'grid'
                               ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
                               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                           }`}
                         >
-                          <LayoutGrid className="w-3 h-3" />
-                          <span>大图标</span>
+                          <div className="flex items-center gap-2">
+                            <LayoutGrid className="w-3 h-3" />
+                            <span>大图标</span>
+                          </div>
+                          {colViewMode === 'grid' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
                         </button>
                         <button
                           onClick={() => handleSetColumnViewMode(col.id, 'details')}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                          className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
                             colViewMode === 'details'
                               ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
                               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                           }`}
                         >
-                          <List className="w-3 h-3" />
-                          <span>详细信息</span>
+                          <div className="flex items-center gap-2">
+                            <List className="w-3 h-3" />
+                            <span>详细信息</span>
+                          </div>
+                          {colViewMode === 'details' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
                         </button>
                         <button
                           onClick={() => handleSetColumnViewMode(col.id, 'tiles')}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold transition ${
+                          className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
                             colViewMode === 'tiles'
                               ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
                               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                           }`}
                         >
-                          <Grid2X2 className="w-3 h-3" />
-                          <span>平铺列表</span>
+                          <div className="flex items-center gap-2">
+                            <Grid2X2 className="w-3 h-3" />
+                            <span>平铺列表</span>
+                          </div>
+                          {colViewMode === 'tiles' && <Check className="w-3 h-3 text-slate-900 dark:text-white shrink-0" />}
                         </button>
                       </div>
                     </div>
@@ -606,7 +644,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       <span>{isOver ? '🎉 放开鼠标添加任务' : '暂无任务卡片 (支持连续拖拽任意多个文件或卡片至此)'}</span>
                     </div>
                   ) : (
-                    <div key={colViewMode} className="space-y-2.5 animate-view-switch">
+                    <div
+                      key={`${colViewMode}-${columnSlideDirs[col.id] || folderSlideDir}`}
+                      className={`space-y-2.5 ${(columnSlideDirs[col.id] || folderSlideDir) === 'left' ? 'animate-view-slide-left' : 'animate-view-slide-right'}`}
+                    >
                       {columnTasks.map((task) => (
                         <TaskCard
                           key={task.id}

@@ -180,6 +180,43 @@
   will-change: transform, opacity;
 }
 
+/* Premium Smooth Horizontal Slide View Animations (大图标 / 详细信息 / 平铺列表) */
+@keyframes viewSlideLeftIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+    filter: blur(1.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes viewSlideRightIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
+    filter: blur(1.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+.animate-view-slide-left {
+  animation: viewSlideLeftIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.animate-view-slide-right {
+  animation: viewSlideRightIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
 
 /* Smooth Drag Animation Feedback */
 .dragging-card {
