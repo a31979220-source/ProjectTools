@@ -14,9 +14,9 @@
 
 ## Features & Highlights
 
-### 1. Modern Visual Design & Dark Mode Adaptation
+### 1. Modern Visual Design & Smooth Directional Slide Animations
 * **Native Dark / Light Theme Toggle**: Supports system theme matching or smooth one-click manual toggling. Windows title bar seamlessly integrates with dark theme.
-* **High-Aesthetic UI & Micro-Animations**: Built with a glassmorphic color system, smooth keyframe transitions, and crisp dark mode cards.
+* **High-Aesthetic UI & Directional Slide Animations**: Built with a glassmorphic color system and smooth keyframe micro-animations. Switching between **Grid**, **Details**, and **Tiles** views features smart bidirectional horizontal slide-in animations (0.55s smooth cubic-bezier easing with subtle blur fade-in).
 
 ### 2. Multi-Dimensional Project Views & Classic Kanban Layout
 * **Agile Kanban Board**:
@@ -38,7 +38,7 @@
   * **Overdue Task Warning Alerts**
 
 ### 4. Workspace Directory Association & Smart Unique Import (Win11 Style)
-* **Local Workspace Association**: Link local code projects or file directories with one click.
+* **Local Workspace Association**: Link local code projects or file directories with one click, featuring compact vertical spacing.
 * **3 Win11 View Modes**:
   1. **Grid Icon View**
   2. **Details Table View**
@@ -62,7 +62,12 @@
 * **Shared File Type Memory**: Custom app associations for `.py` or folder items are automatically shared across all matching files in the workspace.
 * **Disk Storage Persistence**: Uses Windows `AppData` disk storage (`custom-apps.json`) to persist entries permanently across app restarts.
 
-### 7. Backup & Data Security
+### 7. Smart Multi-Source Auto-Update System (Auto Update)
+* **GitHub / Gitee Release API Integration**: Connects directly to GitHub and Gitee Latest Release APIs to fetch the latest Tag (e.g., `v1.1.3`) and binary `.exe` installer assets without CDN cache delay.
+* **In-App Direct Download & Auto-Installer**: Supports downloading updates directly inside the desktop application with a real-time progress bar, automatically launching the installer upon completion.
+* **Refined Compact Layout & Borderless Modal UI**: Side-by-side update status layout in Settings and white-border-free upgrade dialogs for clean visual unity.
+
+### 8. Backup & Data Security
 * **JSON Backup & Restore**: Export full project data to JSON files and restore at any time.
 
 ---
