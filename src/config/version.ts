@@ -13,22 +13,22 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.1',
+  version: '1.0.2',
   releaseDate: '2026-08-01',
-  buildNumber: '20260801.v101',
+  buildNumber: '20260801.v102',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
   downloadUrl: 'https://gitee.com/zhangxiaokaiKAI/project-tools',
   features: [
+    '新增 Gitee/GitHub 在线版本热检查与升级提醒机制',
     '一体化无缝 UI，消除模块割裂感与粗重分割线',
     '侧边栏无极拖拽宽度调节 (180px - 480px)',
     '看板 / 甘特图（精确至小时级起止时刻） / 数据统计三视图',
     '本地代码与项目文件夹极速扫描、批量导入与关联',
     '鼠标滚轮全域垂直滚动与单个看板列独立内部滚动',
     '全局弹窗根节点 Portal 渲染与全屏精准居中',
-    '支持在线比对 Gitee/GitHub 远程最新版本机制',
     'JSON 备份一键导出与还原',
   ],
 };
@@ -56,34 +56,36 @@ export interface UpdateCheckResult {
   error?: string;
 }
 
-export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
-  const urls = [
-    {
-      name: 'Gitee API',
-      url: `https://gitee.com/api/v5/repos/zhangxiaokaiKAI/project-tools/raw/public/version.json?t=${Date.now()}`,
-    },
-    {
-      name: 'Gitee Raw',
-      url: `https://gitee.com/zhangxiaokaiKAI/project-tools/raw/master/public/version.json?t=${Date.now()}`,
-    },
-    {
-      name: 'jsDelivr CDN',
-      url: `https://cdn.jsdelivr.net/gh/a31979220-source/ProjectTools@master/public/version.json?t=${Date.now()}`,
-    },
-    {
-      name: 'GitHub Raw',
-      url: `https://raw.githubusercontent.com/a31979220-source/ProjectTools/master/public/version.json?t=${Date.now()}`,
-    },
-  ];
+function decodeBase64Utf8(base64Str: string): string {
+  try {
+    const cleanStr = base64Str.replace(/\s/g, '');
+    const binaryStr = atob(cleanStr);
+    const bytes = Uint8Array.from(binaryStr, (c) => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  } catch (e) {
+    return atob(base64Str);
+  }
+}
 
+export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
   const currentVersion = APP_VERSION_INFO.version;
 
-  for (const item of urls) {
-    try {
-      const res = await fetch(item.url, { cache: 'no-store' });
-      if (res.ok) {
-        const text = await res.text();
-        const data: AppVersionInfo = JSON.parse(text);
+  // 1. Gitee API Contents (Fastest in mainland China)
+  try {
+    const res = await fetch(
+      `https://gitee.com/api/v5/repos/zhangxiaokaiKAI/project-tools/contents/public/version.json?t=${Date.now()}`,
+      { cache: 'no-store' }
+    );
+    if (res.ok) {
+      const json = await res.json();
+      let rawText = '';
+      if (json.content && json.encoding === 'base64') {
+        rawText = decodeBase64Utf8(json.content);
+      } else if (typeof json === 'string') {
+        rawText = json;
+      }
+      if (rawText) {
+        const data: AppVersionInfo = JSON.parse(rawText);
         if (data && data.version) {
           const hasUpdate = compareVersions(data.version, currentVersion) > 0;
           return {
@@ -91,19 +93,69 @@ export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
             currentVersion,
             remoteVersion: data.version,
             remoteInfo: data,
-            source: item.name,
+            source: 'Gitee API',
           };
         }
       }
-    } catch (e) {
-      console.warn(`Version check failed for ${item.name}:`, e);
     }
+  } catch (e) {
+    console.warn('Gitee API version check failed:', e);
+  }
+
+  // 2. jsDelivr CDN (GitHub fast mirror)
+  try {
+    const res = await fetch(
+      `https://cdn.jsdelivr.net/gh/a31979220-source/ProjectTools@master/public/version.json?t=${Date.now()}`,
+      { cache: 'no-store' }
+    );
+    if (res.ok) {
+      const data: AppVersionInfo = await res.json();
+      if (data && data.version) {
+        const hasUpdate = compareVersions(data.version, currentVersion) > 0;
+        return {
+          hasUpdate,
+          currentVersion,
+          remoteVersion: data.version,
+          remoteInfo: data,
+          source: 'jsDelivr (GitHub)',
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('jsDelivr version check failed:', e);
+  }
+
+  // 3. GitHub API Contents
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/a31979220-source/ProjectTools/contents/public/version.json?t=${Date.now()}`,
+      { cache: 'no-store' }
+    );
+    if (res.ok) {
+      const json = await res.json();
+      if (json.content && json.encoding === 'base64') {
+        const rawText = decodeBase64Utf8(json.content);
+        const data: AppVersionInfo = JSON.parse(rawText);
+        if (data && data.version) {
+          const hasUpdate = compareVersions(data.version, currentVersion) > 0;
+          return {
+            hasUpdate,
+            currentVersion,
+            remoteVersion: data.version,
+            remoteInfo: data,
+            source: 'GitHub API',
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('GitHub API version check failed:', e);
   }
 
   return {
     hasUpdate: false,
     currentVersion,
     remoteVersion: currentVersion,
-    error: '无法连接到 Gitee 或 GitHub 远程服务器（未找到远端版本配置）',
+    error: '无法连接到 Gitee 或 GitHub 远程服务器',
   };
 }
