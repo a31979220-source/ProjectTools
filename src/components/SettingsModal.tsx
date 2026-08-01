@@ -14,7 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { ToastType } from './Toast';
-import { checkRemoteUpdate, UpdateCheckResult } from '../config/version';
+import { checkRemoteUpdate, UpdateCheckResult, APP_VERSION_INFO } from '../config/version';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -309,39 +309,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </h4>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 p-3 space-y-2.5">
+            <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 p-3 flex items-center justify-between gap-3">
+              {/* Left Side: Status Info */}
+              <div className="min-w-0 flex-1">
+                {updateResult?.hasUpdate ? (
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100">
+                    <Info className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                    <span className="truncate">发现新版本 v{updateResult.remoteVersion}，建议升级</span>
+                  </div>
+                ) : updateResult?.error ? (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <AlertCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                    <span className="truncate">{updateResult.error}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                    <span className="truncate">
+                      当前已是最新版本 (v{updateResult?.currentVersion || APP_VERSION_INFO.version})
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side: Check Action Button */}
               <button
                 type="button"
                 onClick={handleCheckUpdate}
                 disabled={isCheckingUpdate}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition active:scale-95 disabled:opacity-70"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs transition active:scale-95 disabled:opacity-70 cursor-pointer"
               >
                 <RefreshCw
                   className={`w-3.5 h-3.5 text-slate-500 ${isCheckingUpdate ? 'animate-spin' : ''}`}
                 />
-                {isCheckingUpdate ? '正在检查最新版本...' : '检查软件最新版本'}
+                <span>{isCheckingUpdate ? '正在检查...' : '检查最新版本'}</span>
               </button>
-
-              {updateResult && !updateResult.error && !updateResult.hasUpdate && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>当前已是最新版本 (v{updateResult.currentVersion})</span>
-                </div>
-              )}
-
-              {updateResult?.error && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                  <span>{updateResult.error}</span>
-                </div>
-              )}
-
-              {updateResult?.hasUpdate && (
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
-                  <Info className="w-3.5 h-3.5 shrink-0" />
-                  <span>发现新版本 v{updateResult.remoteVersion}，建议立即更新</span>
-                </div>
-              )}
             </div>
           </section>
         </div>
