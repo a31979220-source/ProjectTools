@@ -9,4 +9,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getCustomApps: () => ipcRenderer.invoke('store:get-custom-apps'),
   saveCustomApps: (apps) => ipcRenderer.invoke('store:save-custom-apps', apps),
   setTheme: (theme) => ipcRenderer.send('theme:change', theme),
+  downloadAndInstallUpdate: (downloadUrl) => ipcRenderer.invoke('updater:download-and-install', downloadUrl),
+  onUpdateProgress: (callback) => {
+    const subscription = (_, data) => callback(data);
+    ipcRenderer.on('updater:progress', subscription);
+    return () => ipcRenderer.removeListener('updater:progress', subscription);
+  },
 });

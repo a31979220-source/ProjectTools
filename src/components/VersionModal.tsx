@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { APP_VERSION_INFO, UpdateCheckResult } from '../config/version';
-import { X, Sparkles, CheckCircle2, Calendar, ShieldCheck, Tag, Download } from 'lucide-react';
+import { X, Sparkles, CheckCircle2, Calendar, ShieldCheck, Tag, Download, RefreshCw, AlertCircle } from 'lucide-react';
 import appLogo from '../assets/app-icon.png';
 
 interface VersionModalProps {
@@ -11,6 +11,35 @@ interface VersionModalProps {
 }
 
 export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, updateResult }) => {
+  const [downloadState, setDownloadState] = useState<{
+    downloading: boolean;
+    percent: number;
+    receivedMB: string;
+    totalMB: string;
+    error?: string;
+  }>({
+    downloading: false,
+    percent: 0,
+    receivedMB: '0.0',
+    totalMB: '0.0',
+  });
+
+  useEffect(() => {
+    if (window.electronAPI?.onUpdateProgress) {
+      const unsubscribe = window.electronAPI.onUpdateProgress((data) => {
+        const receivedMB = (data.receivedBytes / (1024 * 1024)).toFixed(1);
+        const totalMB = data.totalBytes ? (data.totalBytes / (1024 * 1024)).toFixed(1) : '0.0';
+        setDownloadState({
+          downloading: true,
+          percent: data.percent,
+          receivedMB,
+          totalMB,
+        });
+      });
+      return () => unsubscribe();
+    }
+  }, []);
+
   if (!isOpen) return null;
 
   const hasUpdate = updateResult?.hasUpdate ?? false;
@@ -19,9 +48,24 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   const features = hasUpdate && remoteInfo?.features?.length ? remoteInfo.features : APP_VERSION_INFO.features;
   const downloadUrl = remoteInfo?.downloadUrl || APP_VERSION_INFO.downloadUrl || 'https://gitee.com/zhangxiaokaiKAI/project-tools';
 
-  const handleDownload = () => {
-    window.open(downloadUrl, '_blank');
-    onClose();
+  const handleDownload = async () => {
+    if (downloadState.downloading) return;
+
+    // Direct exe installer URL link from Gitee/GitHub Releases
+    const directExeUrl = `https://gitee.com/zhangxiaokaiKAI/project-tools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
+
+    if (window.electronAPI?.downloadAndInstallUpdate) {
+      setDownloadState({ downloading: true, percent: 0, receivedMB: '0.0', totalMB: '0.0' });
+      const res = await window.electronAPI.downloadAndInstallUpdate(directExeUrl);
+      if (!res.success) {
+        setDownloadState({ downloading: false, percent: 0, receivedMB: '0.0', totalMB: '0.0', error: res.error });
+        // Fallback to web browser open if direct download fails
+        window.open(downloadUrl, '_blank');
+      }
+    } else {
+      window.open(downloadUrl, '_blank');
+      onClose();
+    }
   };
 
   return createPortal(
@@ -31,7 +75,8 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
         <div className="bg-brand-500 p-5 text-white relative overflow-hidden select-none">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition cursor-pointer"
+            disabled={downloadState.downloading}
+            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition cursor-pointer disabled:opacity-50"
           >
             <X className="w-4 h-4" />
           </button>
@@ -81,6 +126,34 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
             </div>
           </div>
 
+          {/* Download Progress Bar */}
+          {downloadState.downloading && (
+            <div className="bg-brand-50/80 dark:bg-brand-950/40 border border-brand-200/60 dark:border-brand-800/60 p-3.5 rounded-xl space-y-2 animate-dropdown-expand">
+              <div className="flex justify-between items-center text-xs font-semibold text-brand-600 dark:text-brand-400">
+                <span className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  {downloadState.percent >= 100 ? '下载完成，正在启动安装向导...' : '应用内极速下载更新中...'}
+                </span>
+                <span className="font-mono text-[11px]">
+                  {downloadState.percent}% ({downloadState.receivedMB} MB / {downloadState.totalMB} MB)
+                </span>
+              </div>
+              <div className="w-full h-2 bg-brand-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand-500 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${downloadState.percent}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {downloadState.error && (
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 p-3 rounded-xl text-xs text-rose-600 dark:text-rose-400 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{downloadState.error}</span>
+            </div>
+          )}
+
           {/* Changelog List */}
           <div>
             <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
@@ -104,16 +177,27 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
             <>
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 bg-slate-200/70 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold transition cursor-pointer"
+                disabled={downloadState.downloading}
+                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 bg-slate-200/70 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
               >
                 稍后提醒
               </button>
               <button
                 onClick={handleDownload}
-                className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shadow-md shadow-brand-500/25 transition hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5"
+                disabled={downloadState.downloading}
+                className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shadow-md shadow-brand-500/25 transition hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5 disabled:opacity-80 disabled:cursor-not-allowed"
               >
-                <Download className="w-3.5 h-3.5" />
-                立即下载更新
+                {downloadState.downloading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    {downloadState.percent >= 100 ? '启动安装中...' : `更新中 (${downloadState.percent}%)`}
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-3.5 h-3.5" />
+                    立即下载更新
+                  </>
+                )}
               </button>
             </>
           ) : (

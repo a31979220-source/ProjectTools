@@ -2,9 +2,13 @@ const { app, BrowserWindow, ipcMain, dialog, shell, nativeTheme } = require('ele
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
+const https = require('https');
+const http = require('http');
 
 function createWindow() {
-  const iconPath = path.join(__dirname, 'icon.png');
+  const iconPath = process.platform === 'win32' 
+    ? path.join(__dirname, 'icon.ico') 
+    : path.join(__dirname, 'icon.png');
 
   const win = new BrowserWindow({
     width: 1280,
@@ -280,6 +284,82 @@ ipcMain.handle('fs:open-file', async (_, filePath) => {
     return true;
   }
   return false;
+});
+
+// IPC Handler: Download update installer .exe and execute install directly inside app
+ipcMain.handle('updater:download-and-install', async (event, url) => {
+  if (!url) return { success: false, error: '无效的下载链接' };
+
+  try {
+    const tempDir = app.getPath('temp');
+    const targetPath = path.join(tempDir, 'ProjectTools-Setup-Latest.exe');
+
+    const downloadFile = (fileUrl, dest, redirectCount = 0) => {
+      return new Promise((resolve, reject) => {
+        if (redirectCount > 5) {
+          return reject(new Error('重定向次数过多'));
+        }
+
+        const client = fileUrl.startsWith('https') ? https : http;
+        client.get(fileUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ProjectTools' }
+        }, (res) => {
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            let redirectUrl = res.headers.location;
+            if (!redirectUrl.startsWith('http')) {
+              const parsed = new URL(fileUrl);
+              redirectUrl = `${parsed.protocol}//${parsed.host}${redirectUrl}`;
+            }
+            return downloadFile(redirectUrl, dest, redirectCount + 1).then(resolve).catch(reject);
+          }
+
+          if (res.statusCode !== 200) {
+            return reject(new Error(`下载失败，HTTP状态码: ${res.statusCode}`));
+          }
+
+          const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
+          let receivedBytes = 0;
+
+          const fileStream = fs.createWriteStream(dest);
+
+          res.on('data', (chunk) => {
+            receivedBytes += chunk.length;
+            fileStream.write(chunk);
+
+            const percent = totalBytes > 0 ? Math.round((receivedBytes / totalBytes) * 100) : 0;
+            event.sender.send('updater:progress', { receivedBytes, totalBytes, percent });
+          });
+
+          res.on('end', () => {
+            fileStream.end(() => resolve(dest));
+          });
+
+          res.on('error', (err) => {
+            fs.unlink(dest, () => {});
+            reject(err);
+          });
+        }).on('error', (err) => {
+          fs.unlink(dest, () => {});
+          reject(err);
+        });
+      });
+    };
+
+    const downloadedPath = await downloadFile(url, targetPath);
+
+    // Launch the downloaded installer executable directly
+    exec(`"${downloadedPath}"`);
+
+    // Quit current app after 1.2s to allow smooth installer overwrite
+    setTimeout(() => {
+      app.quit();
+    }, 1200);
+
+    return { success: true };
+  } catch (err) {
+    console.error('Error downloading update:', err);
+    return { success: false, error: err.message || '下载安装包失败' };
+  }
 });
 
 app.whenReady().then(() => {

@@ -1,10 +1,12 @@
 {
   "appName": "ProjectTools",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "releaseDate": "2026-08-01",
-  "buildNumber": "20260801.v105",
+  "buildNumber": "20260801.v106",
   "downloadUrl": "https://gitee.com/zhangxiaokaiKAI/project-tools",
   "features": [
+    "软件支持应用内极速流式下载更新与静默拉起安装",
+    "软件图标抠图升级，全量消除外围白框实现透明 Alpha 通道",
     "软件更新弹窗统一经典纯蓝背景与整体极简设计优化",
     "全新的简约商务极简风软件更新弹窗 UI 体验升级",
     "【稍后提醒】与【立即下载更新】明确双按键交互设计"

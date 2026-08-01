@@ -1,7 +1,7 @@
 {
   "name": "project-tools",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "commonjs",
   "main": "electron/main.js",
   "scripts": {
@@ -49,7 +49,6 @@
       "target": [
         "nsis"
       ],
-      "signAndEditExecutable": false,
       "verifyUpdateCodeSignature": false
     },
     "nsis": {
@@ -58,6 +57,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "ProjectTools",
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico",
+      "installerHeaderIcon": "electron/icon.ico",
       "artifactName": "${productName}-Setup-${version}.${ext}"
     }
   }
