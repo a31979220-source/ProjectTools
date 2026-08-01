@@ -14,15 +14,15 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.9',
+  version: '1.0.10',
   releaseDate: '2026-08-01',
-  buildNumber: '20260801.v109',
+  buildNumber: '20260801.v1010',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.9/ProjectTools-Setup-1.0.9.exe',
-  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.9/ProjectTools-Setup-1.0.9.exe',
+  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.10/ProjectTools-Setup-1.0.10.exe',
+  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.10/ProjectTools-Setup-1.0.10.exe',
   features: [
     '绿色免安装版与安装版全自动在线热更新支持',
     '新增全自动 Releases CI/CD 发布流与云端极速打包支持',
