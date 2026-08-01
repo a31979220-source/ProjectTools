@@ -3,7 +3,8 @@
   "version": "1.0.7",
   "releaseDate": "2026-08-01",
   "buildNumber": "20260801.v107",
-  "downloadUrl": "https://gitee.com/zhangxiaokaiKAI/project-tools",
+  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe",
+  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe",
   "features": [
     "新增全自动 Releases CI/CD 发布流与云端极速打包支持",
     "软件支持应用内极速流式下载更新与静默拉起安装",

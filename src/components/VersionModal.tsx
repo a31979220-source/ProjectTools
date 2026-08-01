@@ -51,8 +51,8 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   const handleDownload = async () => {
     if (downloadState.downloading) return;
 
-    // Direct exe installer URL link from GitHub Releases
-    const directExeUrl = `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
+    // Direct exe installer URL link from remoteInfo.setupUrl or GitHub Releases
+    const directExeUrl = remoteInfo?.setupUrl || (remoteInfo?.downloadUrl?.endsWith('.exe') ? remoteInfo.downloadUrl : `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`);
 
     if (window.electronAPI?.downloadAndInstallUpdate) {
       setDownloadState({ downloading: true, percent: 0, receivedMB: '0.0', totalMB: '0.0' });

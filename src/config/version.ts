@@ -7,6 +7,7 @@ export interface AppVersionInfo {
   channel: string;
   author: string;
   description: string;
+  setupUrl?: string;
   downloadUrl?: string;
   features: string[];
 }
@@ -20,7 +21,8 @@ export const APP_VERSION_INFO: AppVersionInfo = {
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  downloadUrl: 'https://gitee.com/zhangxiaokaiKAI/project-tools',
+  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe',
+  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.7/ProjectTools-Setup-1.0.7.exe',
   features: [
     '新增全自动 Releases CI/CD 发布流与云端极速打包支持',
     '软件支持应用内极速流式下载更新与静默拉起安装',
