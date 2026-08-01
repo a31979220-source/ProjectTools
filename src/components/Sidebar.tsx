@@ -21,6 +21,8 @@ import {
   Settings as SettingsIcon
 } from 'lucide-react';
 
+
+
 interface SidebarProps {
   projects: Project[];
   activeProjectId: string;
@@ -123,9 +125,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       style={{ width: currentWidth }}
-      className={`bg-slate-50/70 dark:bg-slate-950/70 flex flex-col ${
-        isResizing ? 'transition-none select-none' : 'transition-all duration-200'
-      } relative z-30 select-none shrink-0 group/sidebar`}
+      className={`bg-slate-50/70 dark:bg-slate-950/70 flex flex-col ${isResizing ? 'transition-none select-none' : 'transition-all duration-200'
+        } relative z-30 select-none shrink-0 group/sidebar`}
     >
       {/* Brand Header */}
       <div className="p-4 flex items-center justify-between shrink-0">
@@ -190,26 +191,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       key={id}
                       onClick={() => onSelectViewMode(id)}
                       title={label}
-                      className={`group relative z-10 w-full flex items-center ${
-                        isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
-                      } h-[38px] rounded-xl text-xs font-medium border border-transparent transition-all duration-200 active:scale-[0.98] ${
-                        isActive
+                      className={`group relative z-10 w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'
+                        } h-[38px] rounded-xl text-xs font-medium border border-transparent transition-all duration-200 active:scale-[0.98] ${isActive
                           ? 'text-slate-900 dark:text-white font-semibold'
                           : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
-                      }`}
+                        }`}
                     >
                       <Icon
-                        className={`w-4 h-4 shrink-0 transition-all duration-300 ease-out ${
-                          isActive
+                        className={`w-4 h-4 shrink-0 transition-all duration-300 ease-out ${isActive
                             ? 'scale-110 text-slate-900 dark:text-white'
                             : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 group-hover:scale-105'
-                        }`}
+                          }`}
                       />
                       {!isCollapsed && (
                         <span
-                          className={`truncate transition-transform duration-200 ${
-                            isActive ? 'translate-x-0.5' : 'group-hover:translate-x-0.5'
-                          }`}
+                          className={`truncate transition-transform duration-200 ${isActive ? 'translate-x-0.5' : 'group-hover:translate-x-0.5'
+                            }`}
                         >
                           {label}
                         </span>
@@ -248,11 +245,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={proj.id}
                 onClick={() => onSelectProject(proj.id)}
                 title={proj.name}
-                className={`group flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between px-3 py-2'} rounded-xl text-xs font-medium cursor-pointer border transition-all duration-150 ${
-                  isActive
+                className={`group flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between px-3 py-2'} rounded-xl text-xs font-medium cursor-pointer border transition-all duration-150 ${isActive
                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-[#eeeeee] dark:border-slate-800 shadow-xs font-semibold'
                     : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-900/40 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span

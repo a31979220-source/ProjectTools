@@ -14,17 +14,17 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.1.4',
+  version: '1.2.0',
   releaseDate: '2026-08-02',
-  buildNumber: '20260802.v1104',
+  buildNumber: '20260802.v1200',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.4/ProjectTools-Setup-1.1.4.exe',
-  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.4/ProjectTools-Setup-1.1.4.exe',
+  setupUrl: 'https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.0/ProjectTools-Setup-1.2.0.exe',
+  downloadUrl: 'https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.0/ProjectTools-Setup-1.2.0.exe',
   features: [
-    '优化自定义下拉选择框 CustomSelect 代码格式与微调交互',
+    '优化侧边栏 Sidebar 代码排版与格式',
     '应用设置中的软件更新区域重构为简洁优雅的左右对齐布局',
     '支持大图标、详细信息、平铺列表 视图切换时的左右优雅平滑双向滑动动画',
     '全局交互细节与视觉体验提升',
