@@ -13,15 +13,16 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.2',
+  version: '1.0.3',
   releaseDate: '2026-08-01',
-  buildNumber: '20260801.v102',
+  buildNumber: '20260801.v103',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
   downloadUrl: 'https://gitee.com/zhangxiaokaiKAI/project-tools',
   features: [
+    '版本弹窗与检查更新完全动态联动与体验优化',
     '新增 Gitee/GitHub 在线版本热检查与升级提醒机制',
     '一体化无缝 UI，消除模块割裂感与粗重分割线',
     '侧边栏无极拖拽宽度调节 (180px - 480px)',

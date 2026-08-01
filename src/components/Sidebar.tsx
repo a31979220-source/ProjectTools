@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Project, Task, ViewMode } from '../types/project';
 import { ConfirmModal } from './ConfirmModal';
 import { ToastType } from './Toast';
-import { APP_VERSION_INFO, checkRemoteUpdate } from '../config/version';
+import { APP_VERSION_INFO, checkRemoteUpdate, UpdateCheckResult } from '../config/version';
 import { VersionModal } from './VersionModal';
 import appLogo from '../assets/app-icon.png';
 import { 
@@ -75,6 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isResizing, setIsResizing] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
 
   const handleCheckUpdate = async () => {
     if (isCheckingUpdate) return;
@@ -83,6 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     try {
       const result = await checkRemoteUpdate();
       setIsCheckingUpdate(false);
+      setUpdateResult(result);
 
       if (result.error) {
         if (onShowToast) {
@@ -550,6 +552,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <VersionModal
         isOpen={isVersionModalOpen}
         onClose={() => setIsVersionModalOpen(false)}
+        updateResult={updateResult}
       />
     </aside>
   );
