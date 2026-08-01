@@ -1,4 +1,4 @@
-# ProjectTools - Local Project Management & Agile Kanban Application
+# ProjectTools - Local Project Management & Agile Kanban Desktop Application
 
 [![Electron](https://img.shields.io/badge/Electron-v33.4-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-v18.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -8,22 +8,23 @@
 
 [中文文档](./README.md) | **English Version**
 
-**ProjectTools** is a modern, high-aesthetic, fluid, and powerful **standalone desktop project management & agile Kanban application**. Built with **Electron + React + TypeScript + Tailwind CSS**, it is designed specifically for developers, project managers, and productivity enthusiasts. Operates 100% locally with zero cloud dependencies—your data stays completely private and secure.
+**ProjectTools** is a modern, high-aesthetic, fluid, and powerful **standalone desktop project management & agile Kanban application**. Built with **Electron + React 18 + TypeScript + Vite + Tailwind CSS**, it is designed specifically for developers, project managers, and productivity enthusiasts. Operates 100% locally with zero cloud dependencies—your data stays completely private and secure without requiring any registration or login.
 
 ---
 
-## Features & Highlights
+## 🚀 Features & Highlights
 
 ### 1. Modern Visual Design & Smooth Directional Slide Animations
-* **Native Dark / Light Theme Toggle**: Supports system theme matching or smooth one-click manual toggling. Windows title bar seamlessly integrates with dark theme.
+* **Native Dark / Light Theme Toggle**: Supports system theme auto-matching or smooth one-click manual toggling. Windows title bar seamlessly integrates with native dark/light theme (`nativeTheme`).
 * **High-Aesthetic UI & Directional Slide Animations**: Built with a glassmorphic color system and smooth keyframe micro-animations. Switching between **Grid**, **Details**, and **Tiles** views features smart bidirectional horizontal slide-in animations (0.55s smooth cubic-bezier easing with subtle blur fade-in).
 
 ### 2. Multi-Dimensional Project Views & Classic Kanban Layout
 * **Agile Kanban Board**:
   * **Classic 4-Column Vertical Layout**: Fixed 4-column view (Todo, In Progress, Review, Done) for focused task flow management.
+  * **Drag & Drop Reordering**: Drag tasks freely within columns or across different status columns.
   * **Direct Interactive Priority Dropdown**: Change task priority (Urgent, High, Medium, Low) directly from cards or modals via interactive dropdown select buttons.
   * **Independent Per-Column Display Modes**: Switch each column's card layout independently between **Grid Card**, **Compact Details**, and **Tiles View**, with a top master control bar for batch switching.
-  * **Rich Task Card Details**: Displays full un-truncated titles, associated file paths, split "Open With" buttons, priority badges, tags, subtask progress, and due dates/overdue alerts.
+  * **Rich Task Card Details**: Displays full un-truncated titles, associated file paths, split "Open With" buttons, priority badges, tags, subtask progress checklist, and due dates/overdue alerts.
   * **Adaptive Fluid Vertical Scrolling**: Flexbox-driven column containers enable independent smooth scrolling without layout overflow or truncation.
 * **Gantt Chart Timeline**:
   * Visual project scheduling with daily and weekly timeline zoom controls.
@@ -57,7 +58,7 @@
   * **Browse .exe Files**: Select any custom binary executable on disk.
 
 ### 6. Native Icon Extraction & Shared File Type Memory
-* **Windows Native Icon Extraction**: Extracts embedded high-resolution icons from `.exe` files (e.g., IntelliJ IDEA, PyCharm, Sublime Text).
+* **Windows Native Icon Extraction**: Extracts embedded high-resolution icons from `.exe` files (e.g., IntelliJ IDEA, PyCharm, Sublime Text, Typora).
 * **Official Product Name Resolution**: Parses version info (e.g., resolves `idea64` to `IntelliJ IDEA`).
 * **Shared File Type Memory**: Custom app associations for `.py` or folder items are automatically shared across all matching files in the workspace.
 * **Disk Storage Persistence**: Uses Windows `AppData` disk storage (`custom-apps.json`) to persist entries permanently across app restarts.
@@ -69,20 +70,21 @@
 
 ### 8. Backup & Data Security
 * **JSON Backup & Restore**: Export full project data to JSON files and restore at any time.
+* **Custom Download & Backup Paths**: Specify custom default export and save directories in application settings.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 * **Desktop Container**: Electron 33
-* **Frontend**: React 18 + TypeScript
-* **Build Tools**: Vite 6 + Tailwind CSS
+* **Frontend**: React 18 + TypeScript 5
+* **Build Tools**: Vite 6 + Tailwind CSS 3
 * **Icon Library**: Lucide React
 * **Packaging**: Electron Packager (with `--ignore` rule for instant packaging)
 
 ---
 
-## Quick Start & Build
+## ⚡ Quick Start & Build
 
 ### 1. Install Dependencies
 ```bash
@@ -99,7 +101,7 @@ npm run electron:dev
 npm run build
 ```
 
-### 4. Package as Windows Desktop .exe (Instant 3-Second Packaging)
+### 4. Package as Windows Portable Desktop (.exe)
 ```bash
 npm run pack:exe
 ```
@@ -107,6 +109,6 @@ After packaging, find the standalone `ProjectTools.exe` inside `release/ProjectT
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
