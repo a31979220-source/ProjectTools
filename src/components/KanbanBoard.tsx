@@ -309,7 +309,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="w-56 shrink-0 bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:border-brand-500/60 rounded-xl p-3 flex flex-col justify-between transition-all hover:shadow-md group/card cursor-grab active:cursor-grabbing"
+                        className="w-56 shrink-0 bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-brand-500/50 rounded-xl p-3 flex flex-col justify-between transition-all duration-200 hover:shadow-md group/card cursor-grab active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5 mb-2 min-w-0">
                           {getFileIcon(item)}
@@ -424,7 +424,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={item.path}
                         draggable
                         onDragStart={(e) => handleFileDragStart(e, item)}
-                        className="bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:border-brand-500/60 rounded-xl p-2.5 flex items-center justify-between transition hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
+                        className="bg-slate-50/80 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 hover:border-brand-500/50 rounded-xl p-2.5 flex items-center justify-between transition-all duration-200 hover:shadow-sm cursor-grab active:cursor-grabbing group/tile"
                       >
                         <div className="flex items-center gap-2.5 min-w-0 flex-1">
                           {getFileIcon(item)}
@@ -491,14 +491,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 onDragOver={(e) => handleDragOver(e, col.id)}
                 onDragLeave={(e) => handleDragLeave(e, col.id)}
                 onDrop={(e) => handleDrop(e, col.id)}
-                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border transition-all duration-200 ${
+                className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-2xl bg-slate-100/40 dark:bg-slate-900/40 border transition-all duration-200 shadow-xs ${
                   isOver
                     ? 'border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/40 shadow-glow'
-                    : 'border-slate-200/80 dark:border-slate-800'
+                    : 'border-slate-200/60 dark:border-slate-800/60'
                 }`}
               >
                 {/* Column Header: Draggable Grip Handle & Independent Display Switcher */}
-                <div className="p-3 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 cursor-grab active:cursor-grabbing shrink-0">
+                <div className="p-3 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 bg-slate-200/20 dark:bg-slate-800/20 rounded-t-2xl cursor-grab active:cursor-grabbing shrink-0">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <GripVertical className="w-3.5 h-3.5 text-slate-400 opacity-60 hover:opacity-100 shrink-0" />
                     <span
@@ -515,7 +515,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                   <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                     {/* Mini Column Independent Display Mode Switcher */}
-                    <div className="flex items-center bg-slate-200/70 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-300/60 dark:border-slate-700/60">
+                    <div className="flex items-center bg-white dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
                       <button
                         onClick={() => handleSetColumnViewMode(col.id, 'grid')}
                         title="当前列：大图标模式"
