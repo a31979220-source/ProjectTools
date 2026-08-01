@@ -14,21 +14,20 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.14',
+  version: '1.1.0',
   releaseDate: '2026-08-02',
-  buildNumber: '20260802.v1014',
+  buildNumber: '20260802.v1100',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
-  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.13/ProjectTools-Setup-1.0.13.exe',
-  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.13/ProjectTools-Setup-1.0.13.exe',
+  setupUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe',
+  downloadUrl: 'https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe',
   features: [
+    '优化远程版本检查逻辑，优先查询 GitHub/Gitee Release API 接口',
+    '修复旧缓存节点导致不提示新版本更新的问题',
     '视图切换按钮优化为下拉框形式，提升操作效率',
     '全面 UI 黑白极简化改造，去除所有非必要彩色装饰',
-    '设置页面去除装饰图标，统一黑白配色',
-    '优先级选择器与统计面板彩色标识优化',
-    '卡片左侧状态指示条保留彩色区分',
     '全局交互细节与视觉体验提升',
   ],
 };
@@ -69,8 +68,135 @@ function decodeBase64Utf8(base64Str: string): string {
 
 export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
   const currentVersion = APP_VERSION_INFO.version;
+  let fallbackResult: UpdateCheckResult | null = null;
 
-  // 1. Gitee API Contents (Fastest in mainland China)
+  const updateFallback = (res: UpdateCheckResult) => {
+    if (!fallbackResult) {
+      fallbackResult = res;
+    }
+  };
+
+  // 1. GitHub Releases Latest API (优先查询 Releases 发布的最新版本)
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/a31979220-source/ProjectTools/releases/latest?t=${Date.now()}`,
+      {
+        headers: { Accept: 'application/vnd.github.v3+json' },
+        cache: 'no-store',
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const rawTag = data.tag_name || data.name || '';
+      const version = rawTag.replace(/^v/i, '').trim();
+      if (version) {
+        const setupAsset = data.assets?.find((a: any) => a.name && a.name.endsWith('.exe'));
+        const downloadUrl =
+          setupAsset?.browser_download_url ||
+          `https://github.com/a31979220-source/ProjectTools/releases/download/v${version}/ProjectTools-Setup-${version}.exe`;
+        const features = data.body
+          ? data.body
+              .split('\n')
+              .map((l: string) => l.replace(/^[-*#]\s*/, '').trim())
+              .filter(Boolean)
+          : [];
+        const remoteInfo: AppVersionInfo = {
+          ...APP_VERSION_INFO,
+          version,
+          setupUrl: downloadUrl,
+          downloadUrl: downloadUrl,
+          features: features.length ? features : APP_VERSION_INFO.features,
+        };
+        const hasUpdate = compareVersions(version, currentVersion) > 0;
+        const result: UpdateCheckResult = {
+          hasUpdate,
+          currentVersion,
+          remoteVersion: version,
+          remoteInfo,
+          source: 'GitHub Release',
+        };
+        if (hasUpdate) return result;
+        updateFallback(result);
+      }
+    }
+  } catch (e) {
+    console.warn('GitHub Release API check failed:', e);
+  }
+
+  // 2. Gitee Releases Latest API
+  try {
+    const res = await fetch(
+      `https://gitee.com/api/v5/repos/zhangxiaokaiKAI/project-tools/releases/latest?t=${Date.now()}`,
+      { cache: 'no-store' }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const rawTag = data.tag_name || data.name || '';
+      const version = rawTag.replace(/^v/i, '').trim();
+      if (version) {
+        const setupAsset = data.assets?.find((a: any) => a.name && a.name.endsWith('.exe'));
+        const downloadUrl =
+          setupAsset?.browser_download_url ||
+          `https://gitee.com/zhangxiaokaiKAI/project-tools/releases/download/v${version}/ProjectTools-Setup-${version}.exe`;
+        const features = data.body
+          ? data.body
+              .split('\n')
+              .map((l: string) => l.replace(/^[-*#]\s*/, '').trim())
+              .filter(Boolean)
+          : [];
+        const remoteInfo: AppVersionInfo = {
+          ...APP_VERSION_INFO,
+          version,
+          setupUrl: downloadUrl,
+          downloadUrl: downloadUrl,
+          features: features.length ? features : APP_VERSION_INFO.features,
+        };
+        const hasUpdate = compareVersions(version, currentVersion) > 0;
+        const result: UpdateCheckResult = {
+          hasUpdate,
+          currentVersion,
+          remoteVersion: version,
+          remoteInfo,
+          source: 'Gitee Release',
+        };
+        if (hasUpdate) return result;
+        updateFallback(result);
+      }
+    }
+  } catch (e) {
+    console.warn('Gitee Release API check failed:', e);
+  }
+
+  // 3. GitHub Contents Raw API (public/version.json)
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/a31979220-source/ProjectTools/contents/public/version.json?t=${Date.now()}`,
+      { cache: 'no-store' }
+    );
+    if (res.ok) {
+      const json = await res.json();
+      if (json.content && json.encoding === 'base64') {
+        const rawText = decodeBase64Utf8(json.content);
+        const data: AppVersionInfo = JSON.parse(rawText);
+        if (data && data.version) {
+          const hasUpdate = compareVersions(data.version, currentVersion) > 0;
+          const result: UpdateCheckResult = {
+            hasUpdate,
+            currentVersion,
+            remoteVersion: data.version,
+            remoteInfo: data,
+            source: 'GitHub Raw API',
+          };
+          if (hasUpdate) return result;
+          updateFallback(result);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('GitHub Raw API check failed:', e);
+  }
+
+  // 4. Gitee API Contents (public/version.json)
   try {
     const res = await fetch(
       `https://gitee.com/api/v5/repos/zhangxiaokaiKAI/project-tools/contents/public/version.json?t=${Date.now()}`,
@@ -88,21 +214,23 @@ export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
         const data: AppVersionInfo = JSON.parse(rawText);
         if (data && data.version) {
           const hasUpdate = compareVersions(data.version, currentVersion) > 0;
-          return {
+          const result: UpdateCheckResult = {
             hasUpdate,
             currentVersion,
             remoteVersion: data.version,
             remoteInfo: data,
-            source: 'Gitee API',
+            source: 'Gitee Raw API',
           };
+          if (hasUpdate) return result;
+          updateFallback(result);
         }
       }
     }
   } catch (e) {
-    console.warn('Gitee API version check failed:', e);
+    console.warn('Gitee API check failed:', e);
   }
 
-  // 2. jsDelivr CDN (GitHub fast mirror)
+  // 5. jsDelivr CDN (GitHub fast mirror)
   try {
     const res = await fetch(
       `https://cdn.jsdelivr.net/gh/a31979220-source/ProjectTools@master/public/version.json?t=${Date.now()}`,
@@ -112,44 +240,23 @@ export async function checkRemoteUpdate(): Promise<UpdateCheckResult> {
       const data: AppVersionInfo = await res.json();
       if (data && data.version) {
         const hasUpdate = compareVersions(data.version, currentVersion) > 0;
-        return {
+        const result: UpdateCheckResult = {
           hasUpdate,
           currentVersion,
           remoteVersion: data.version,
           remoteInfo: data,
-          source: 'jsDelivr (GitHub)',
+          source: 'jsDelivr CDN',
         };
+        if (hasUpdate) return result;
+        updateFallback(result);
       }
     }
   } catch (e) {
     console.warn('jsDelivr version check failed:', e);
   }
 
-  // 3. GitHub API Contents
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/a31979220-source/ProjectTools/contents/public/version.json?t=${Date.now()}`,
-      { cache: 'no-store' }
-    );
-    if (res.ok) {
-      const json = await res.json();
-      if (json.content && json.encoding === 'base64') {
-        const rawText = decodeBase64Utf8(json.content);
-        const data: AppVersionInfo = JSON.parse(rawText);
-        if (data && data.version) {
-          const hasUpdate = compareVersions(data.version, currentVersion) > 0;
-          return {
-            hasUpdate,
-            currentVersion,
-            remoteVersion: data.version,
-            remoteInfo: data,
-            source: 'GitHub API',
-          };
-        }
-      }
-    }
-  } catch (e) {
-    console.warn('GitHub API version check failed:', e);
+  if (fallbackResult) {
+    return fallbackResult;
   }
 
   return {

@@ -1,13 +1,13 @@
 {
   "appName": "ProjectTools",
-  "version": "1.0.14",
+  "version": "1.1.0",
   "releaseDate": "2026-08-02",
-  "buildNumber": "20260802.v1014",
-  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.14/ProjectTools-Setup-1.0.14.exe",
-  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.0.14/ProjectTools-Setup-1.0.14.exe",
+  "buildNumber": "20260802.v1100",
+  "setupUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe",
+  "downloadUrl": "https://github.com/a31979220-source/ProjectTools/releases/download/v1.1.0/ProjectTools-Setup-1.1.0.exe",
   "features": [
-    "优化更新提示显示版本来源信息",
-    "优化批量导入确认框样式，使用美化后的 ConfirmModal 组件",
+    "优化远程版本检查逻辑，优先查询 GitHub/Gitee Release API 接口",
+    "修复旧缓存节点导致不提示新版本更新的问题",
     "视图切换按钮优化为下拉框形式，提升操作效率",
     "全面 UI 黑白极简化改造，去除所有非必要彩色装饰",
     "全局交互细节与视觉体验提升"
