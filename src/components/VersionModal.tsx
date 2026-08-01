@@ -51,15 +51,19 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
   const handleDownload = async () => {
     if (downloadState.downloading) return;
 
-    // 统一使用安装包更新，不再区分绿色版/安装版
+    // 统一使用安装包更新，始终下载最新版本
     let directUrl = '';
     if (remoteInfo?.setupUrl) {
       directUrl = remoteInfo.setupUrl;
     } else if (remoteInfo?.downloadUrl && remoteInfo.downloadUrl.endsWith('.exe')) {
       directUrl = remoteInfo.downloadUrl;
     } else {
+      // 始终构建最新版本的下载链接
       directUrl = `https://github.com/a31979220-source/ProjectTools/releases/download/v${remoteVersion}/ProjectTools-Setup-${remoteVersion}.exe`;
     }
+
+    console.log('[Update] Downloading from:', directUrl);
+    console.log('[Update] Remote version:', remoteVersion);
 
     if (window.electronAPI?.downloadAndInstallUpdate) {
       setDownloadState({ downloading: true, percent: 0, receivedMB: '0.0', totalMB: '0.0' });
@@ -132,6 +136,13 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose, upd
               </div>
             </div>
           </div>
+
+          {/* Update Source Info */}
+          {hasUpdate && updateResult?.source && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-xl border border-blue-200 dark:border-blue-800 text-[11px] text-blue-700 dark:text-blue-300 flex items-center gap-2">
+              <span>📡 版本来源: {updateResult.source}</span>
+            </div>
+          )}
 
           {/* Download Progress Bar */}
           {downloadState.downloading && (

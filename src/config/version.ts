@@ -14,9 +14,9 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.13',
+  version: '1.0.14',
   releaseDate: '2026-08-02',
-  buildNumber: '20260802.v1013',
+  buildNumber: '20260802.v1014',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
