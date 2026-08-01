@@ -1,12 +1,12 @@
 {
   "appName": "ProjectTools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "releaseDate": "2026-08-01",
-  "buildNumber": "20260801.v103",
+  "buildNumber": "20260801.v104",
   "downloadUrl": "https://gitee.com/zhangxiaokaiKAI/project-tools",
   "features": [
-    "版本弹窗与检查更新完全动态联动与体验优化",
-    "新增 Gitee/GitHub 在线版本热检查与升级提醒机制",
-    "侧边栏无极拖拽宽度调节与极简一体化UI"
+    "全新的简约商务极简风软件更新弹窗 UI 体验升级",
+    "【稍后提醒】与【立即下载更新】明确双按键交互设计",
+    "新增 Gitee/GitHub 在线版本热检查与升级提醒机制"
   ]
 }

@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
       } else if (result.hasUpdate) {
         if (onShowToast) {
-          onShowToast(`🚀 发现新版本 v${result.remoteVersion} (${result.source})！`, 'info');
+          onShowToast(`🚀 发现新版本 v${result.remoteVersion}，建议立即更新！`, 'info');
         }
         setIsVersionModalOpen(true);
       } else {
