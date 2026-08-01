@@ -29,9 +29,12 @@ jobs:
         run: |
           npm run pack:setup
           npm run pack:exe
-          powershell -Command "Compress-Archive -Path 'release/ProjectTools-win32-x64/*' -DestinationPath \"release/ProjectTools-Portable-${{ github.ref_name }}.zip\" -Force"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 打包绿色免安装版 ZIP
+        shell: pwsh
+        run: Compress-Archive -Path 'release/ProjectTools-win32-x64/*' -DestinationPath "release/ProjectTools-Portable-${{ github.ref_name }}.zip" -Force
 
       - name: 自动发布 GitHub Release 并上传安装包与绿色版附件
         uses: softprops/action-gh-release@v2
