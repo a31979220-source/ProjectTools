@@ -13,15 +13,16 @@ export interface AppVersionInfo {
 
 export const APP_VERSION_INFO: AppVersionInfo = {
   appName: 'ProjectTools',
-  version: '1.0.6',
+  version: '1.0.7',
   releaseDate: '2026-08-01',
-  buildNumber: '20260801.v106',
+  buildNumber: '20260801.v107',
   environment: 'production',
   channel: 'Stable Desktop',
   author: 'ProjectTools Team',
   description: '极简现代清爽风本地项目管理与看板系统',
   downloadUrl: 'https://gitee.com/zhangxiaokaiKAI/project-tools',
   features: [
+    '新增全自动 Releases CI/CD 发布流与云端极速打包支持',
     '软件支持应用内极速流式下载更新与静默拉起安装',
     '软件图标抠图升级，全量消除外围白框实现透明 Alpha 通道',
     '软件更新弹窗统一经典纯蓝背景与整体极简设计优化',
