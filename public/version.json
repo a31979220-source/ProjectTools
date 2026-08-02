@@ -1,14 +1,12 @@
 {
   "appName": "ProjectTools",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "releaseDate": "2026-08-02",
-  "buildNumber": "20260802.v1200",
-  "setupUrl": "https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.0/ProjectTools-Setup-1.2.0.exe",
-  "downloadUrl": "https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.0/ProjectTools-Setup-1.2.0.exe",
+  "buildNumber": "20260802.v1210",
+  "setupUrl": "https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.1/ProjectTools-Setup-1.2.1.exe",
+  "downloadUrl": "https://github.com/xiaokaisk/ProjectTools/releases/download/v1.2.1/ProjectTools-Setup-1.2.1.exe",
   "features": [
-    "优化侧边栏 Sidebar 代码排版与格式",
-    "应用设置中的软件更新区域重构为简洁优雅的左右对齐布局",
-    "支持大图标、详细信息、平铺列表 视图切换时的左右优雅平滑双向滑动动画",
-    "全局交互细节与视觉体验提升"
+    "点击重新扫描工作区文件时新增 Toast 状态提示",
+    "优化工作区本地文件与目录扫描交互体验"
   ]
 }

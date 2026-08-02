@@ -122,10 +122,13 @@ export function App() {
     fetchLocalFolderFiles();
   }, [activeProjectId, projects]);
 
-  const fetchLocalFolderFiles = async () => {
+  const fetchLocalFolderFiles = async (showNotification = false) => {
     const currentProj = projects.find((p) => p.id === activeProjectId);
     if (!currentProj || !currentProj.localFolderPath) {
       setLocalFiles([]);
+      if (showNotification) {
+        showToast('未关联本地工作区文件夹', 'info');
+      }
       return;
     }
 
@@ -134,10 +137,20 @@ export function App() {
       try {
         const files = await window.electronAPI.readFolderContent(currentProj.localFolderPath);
         setLocalFiles(files);
+        if (showNotification) {
+          showToast(`已重新扫描工作区，共找到 ${files.length} 项`, 'success');
+        }
       } catch (err) {
         console.error('读取本地目录失败:', err);
+        if (showNotification) {
+          showToast('重新扫描失败，无法读取本地目录', 'danger');
+        }
       } finally {
         setIsLoadingFiles(false);
+      }
+    } else {
+      if (showNotification) {
+        showToast('当前环境不支持读取本地文件夹', 'info');
       }
     }
   };
@@ -569,7 +582,7 @@ export function App() {
                 localFolderPath={activeProject?.localFolderPath}
                 localFiles={localFiles}
                 isLoadingFiles={isLoadingFiles}
-                onRefreshFiles={fetchLocalFolderFiles}
+                onRefreshFiles={() => fetchLocalFolderFiles(true)}
                 onMoveTask={handleMoveTask}
                 onEditTask={(task, e) => handleEditTaskModal(task, e)}
                 onDeleteTask={handleDeleteTask}
