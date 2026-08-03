@@ -55,6 +55,8 @@ const STATUS_STYLE_CONFIG: Record<string, {
 const renderTaskTitleWithStatusIcon = (title: string, columnId: string) => {
   const statusConfig = STATUS_STYLE_CONFIG[columnId] || STATUS_STYLE_CONFIG.todo;
 
+
+
   if (title.startsWith('📁 文件夹:') || title.startsWith('文件夹:')) {
     const name = title.replace(/^📁\s*文件夹:\s*/, '').replace(/^文件夹:\s*/, '');
     return (
@@ -120,126 +122,125 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const statusStyle = STATUS_STYLE_CONFIG[task.columnId] || STATUS_STYLE_CONFIG.todo;
 
   // Check if overdue
-  const isOverdue = task.dueDate && new Date(task.dueDate).getTime() < new Date().setHours(0,0,0,0) && task.columnId !== 'done';
+  const isOverdue = task.dueDate && new Date(task.dueDate).getTime() < new Date().setHours(0, 0, 0, 0) && task.columnId !== 'done';
   const isDueToday = task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString() && task.columnId !== 'done';
 
   /* ================= DETAILS LIST VIEW MODE ================= */
   if (viewMode === 'details') {
     return (
       <>
-      <div
-        draggable
-        onDragStart={(e) => onDragStart(e, task.id)}
-        className={`group relative border rounded-2xl p-3 shadow-2xs hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
-      >
-        {/* Header: Priority + Title + Actions */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <PrioritySelect
-              value={task.priority}
-              onChange={handlePriorityChange}
-              size="xs"
-              className="shrink-0"
-            />
-            <h3
-              onClick={(e) => onEdit(task, e)}
-              className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-slate-900 dark:hover:text-white cursor-pointer transition"
-              title={task.title}
-            >
-              {renderTaskTitleWithStatusIcon(task.title, task.columnId)}
-            </h3>
-          </div>
-
-          <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
-            <button
-              onClick={(e) => onEdit(task, e)}
-              className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
-              title="编辑任务"
-            >
-              <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDeleteConfirmOpen(true);
-              }}
-              className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
-              title="删除任务"
-            >
-              <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
-            </button>
-          </div>
-        </div>
-
-        {/* Associated Local Folder & OpenWith Split Button */}
-        {task.associatedPath && (
-          <div className={`px-2 py-1 rounded-lg text-[11px] font-mono flex items-center justify-between gap-1 border transition-colors duration-300 truncate ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
-            <div className="flex items-center gap-1.5 min-w-0 truncate">
-              <FolderOpen className={`w-3.5 h-3.5 shrink-0 transition-colors duration-300 ${statusStyle.iconColor}`} />
-              <span className="truncate" title={task.associatedPath}>
-                {task.associatedPath}
-              </span>
-            </div>
-            <div onClick={(e) => e.stopPropagation()} className="shrink-0">
-              <OpenWithMenu
-                itemPath={task.associatedPath}
-                isDirectory={true}
-                size="sm"
+        <div
+          draggable
+          onDragStart={(e) => onDragStart(e, task.id)}
+          className={`group relative border rounded-2xl p-3 shadow-2xs hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 ${statusStyle.cardBg} ${statusStyle.cardBorder} ${statusStyle.cardIndicator}`}
+        >
+          {/* Header: Priority + Title + Actions */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <PrioritySelect
+                value={task.priority}
+                onChange={handlePriorityChange}
+                size="xs"
+                className="shrink-0"
               />
+              <h3
+                onClick={(e) => onEdit(task, e)}
+                className="font-bold text-xs text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 hover:text-slate-900 dark:hover:text-white cursor-pointer transition"
+                title={task.title}
+              >
+                {renderTaskTitleWithStatusIcon(task.title, task.columnId)}
+              </h3>
+            </div>
+
+            <div className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 flex items-center gap-1.5 transition-all duration-200 shrink-0">
+              <button
+                onClick={(e) => onEdit(task, e)}
+                className="group/edit p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+                title="编辑任务"
+              >
+                <Edit3 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/edit:rotate-12 group-hover/edit:scale-110" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteConfirmOpen(true);
+                }}
+                className="group/del p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 dark:hover:bg-white text-slate-600 dark:text-slate-300 hover:text-white dark:hover:text-slate-900 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:border-slate-900 dark:hover:border-white shadow-2xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
+                title="删除任务"
+              >
+                <Trash2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover/del:-rotate-12 group-hover/del:scale-110" />
+              </button>
             </div>
           </div>
-        )}
 
-        {/* Tags / Subtasks & Due Date Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60">
-          <div className="flex items-center gap-2">
-            {task.tags && task.tags.length > 0 && (
-              <div className="flex items-center gap-1">
-                {task.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[9px] text-slate-600 dark:text-slate-400 font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
+          {/* Associated Local Folder & OpenWith Split Button */}
+          {task.associatedPath && (
+            <div className={`px-2 py-1 rounded-lg text-[11px] font-mono flex items-center justify-between gap-1 border transition-colors duration-300 truncate ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
+                <FolderOpen className={`w-3.5 h-3.5 shrink-0 transition-colors duration-300 ${statusStyle.iconColor}`} />
+                <span className="truncate" title={task.associatedPath}>
+                  {task.associatedPath}
+                </span>
               </div>
-            )}
-            {totalSubtasks > 0 && (
-              <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400 font-medium">
-                <CheckSquare className="w-3 h-3 text-brand-500" />
-                {completedSubtasks}/{totalSubtasks}
-              </span>
-            )}
-          </div>
-
-          {task.dueDate && (
-            <div
-              className={`flex items-center gap-1 font-medium ${
-                isOverdue
-                  ? 'text-rose-500 font-bold'
-                  : isDueToday
-                  ? 'text-amber-500 font-bold'
-                  : 'text-slate-400'
-              }`}
-            >
-              {isOverdue ? (
-                <AlertCircle className="w-3 h-3 text-rose-500 animate-pulse" />
-              ) : (
-                <Calendar className="w-3 h-3" />
-              )}
-              <span>{task.dueDate}</span>
+              <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                <OpenWithMenu
+                  itemPath={task.associatedPath}
+                  isDirectory={true}
+                  size="sm"
+                />
+              </div>
             </div>
           )}
+
+          {/* Tags / Subtasks & Due Date Footer */}
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+            <div className="flex items-center gap-2">
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex items-center gap-1">
+                  {task.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[9px] text-slate-600 dark:text-slate-400 font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {totalSubtasks > 0 && (
+                <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400 font-medium">
+                  <CheckSquare className="w-3 h-3 text-brand-500" />
+                  {completedSubtasks}/{totalSubtasks}
+                </span>
+              )}
+            </div>
+
+            {task.dueDate && (
+              <div
+                className={`flex items-center gap-1 font-medium ${isOverdue
+                  ? 'text-rose-500 font-bold'
+                  : isDueToday
+                    ? 'text-amber-500 font-bold'
+                    : 'text-slate-400'
+                  }`}
+              >
+                {isOverdue ? (
+                  <AlertCircle className="w-3 h-3 text-rose-500 animate-pulse" />
+                ) : (
+                  <Calendar className="w-3 h-3" />
+                )}
+                <span>{task.dueDate}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <ConfirmModal
-        isOpen={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        onConfirm={() => onDelete(task.id)}
-        title="删除任务确认"
-        message={`确定要删除任务 "${task.title}" 吗？关联的数据与记录将被永久移除。`}
-      />
+        <ConfirmModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          onConfirm={() => onDelete(task.id)}
+          title="删除任务确认"
+          message={`确定要删除任务 "${task.title}" 吗？关联的数据与记录将被永久移除。`}
+        />
       </>
     );
   }
@@ -434,7 +435,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 <input
                   type="checkbox"
                   checked={st.completed}
-                  onChange={() => {}} // handled by div click
+                  onChange={() => { }} // handled by div click
                   className="rounded text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer w-3 h-3"
                 />
                 <span className={`truncate ${st.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>
@@ -450,13 +451,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       {task.dueDate && (
         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/60 text-[10px]">
           <div
-            className={`flex items-center gap-1 font-medium ${
-              isOverdue
-                ? 'text-rose-500 font-bold'
-                : isDueToday
+            className={`flex items-center gap-1 font-medium ${isOverdue
+              ? 'text-rose-500 font-bold'
+              : isDueToday
                 ? 'text-amber-500 font-bold'
                 : 'text-slate-400'
-            }`}
+              }`}
           >
             {isOverdue ? (
               <AlertCircle className="w-3 h-3 text-rose-500 animate-pulse" />
